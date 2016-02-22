@@ -1,0 +1,120 @@
+
+textures.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+blue_orb
+  rotate: false
+  xy: 2, 167
+  size: 165, 163
+  orig: 165, 163
+  offset: 0, 0
+  index: -1
+counter_attack_background
+  rotate: false
+  xy: 2, 332
+  size: 1020, 670
+  orig: 1020, 670
+  offset: 0, 0
+  index: -1
+green_orb
+  rotate: false
+  xy: 169, 39
+  size: 146, 144
+  orig: 146, 144
+  offset: 0, 0
+  index: -1
+purple_orb
+  rotate: false
+  xy: 169, 185
+  size: 147, 145
+  orig: 147, 145
+  offset: 0, 0
+  index: -1
+yellow_orb
+  rotate: false
+  xy: 2, 2
+  size: 165, 163
+  orig: 165, 163
+  offset: 0, 0
+  index: -1
+
+textures2.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+defense_background
+  rotate: false
+  xy: 2, 2
+  size: 1020, 670
+  orig: 1020, 670
+  offset: 0, 0
+  index: -1
+
+textures3.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+trap_background
+  rotate: false
+  xy: 2, 2
+  size: 1020, 670
+  orig: 1020, 670
+  offset: 0, 0
+  index: -1
+
+textures4.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+monster_shield_off
+  rotate: false
+  xy: 2, 2
+  size: 417, 415
+  orig: 417, 415
+  offset: 0, 0
+  index: -1
+monster_shield_on
+  rotate: false
+  xy: 516, 528
+  size: 350, 403
+  orig: 350, 403
+  offset: 0, 0
+  index: -1
+trap_closed
+  rotate: false
+  xy: 2, 419
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+
+textures5.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+trap_open
+  rotate: false
+  xy: 2, 2
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+
+textures6.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+trap_opening
+  rotate: false
+  xy: 2, 2
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1

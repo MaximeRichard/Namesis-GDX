@@ -1,4 +1,4 @@
-package maje.gameleon.hunterd;
+package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.ApplicationListener;
