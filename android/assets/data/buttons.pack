@@ -1,0 +1,33 @@
+
+buttons.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+blue_orb
+  rotate: false
+  xy: 1, 1
+  size: 165, 163
+  orig: 165, 163
+  offset: 0, 0
+  index: -1
+yellow_orb
+  rotate: false
+  xy: 168, 1
+  size: 165, 163
+  orig: 165, 163
+  offset: 0, 0
+  index: -1
+purple_orb
+  rotate: false
+  xy: 335, 19
+  size: 147, 145
+  orig: 147, 145
+  offset: 0, 0
+  index: -1
+green_orb
+  rotate: false
+  xy: 484, 20
+  size: 146, 144
+  orig: 146, 144
+  offset: 0, 0
+  index: -1
