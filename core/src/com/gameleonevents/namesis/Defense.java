@@ -29,6 +29,12 @@ import javax.xml.soap.Text;
  * Created by Pierre on 17/02/2016.
  */
 
+enum BrickColor{
+    PURPLE,
+    GREEN,
+    YELLOW,
+    BLUE
+}
 
 public class Defense extends ApplicationAdapter {
 
@@ -172,7 +178,12 @@ public class Defense extends ApplicationAdapter {
         stage.addActor(purpleButton);
     }
 
+<<<<<<< HEAD
     public void InitializeGame(){
+=======
+    public void SpawnBrick(BrickColor color)
+    {
+>>>>>>> origin/master
 
     }
 
