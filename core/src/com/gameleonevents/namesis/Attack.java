@@ -23,20 +23,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.awt.Rectangle;
+
 import javax.xml.soap.Text;
 
 /**
  * Created by Pierre on 17/02/2016.
  */
 
-enum BrickColor{
-    PURPLE,
-    GREEN,
-    YELLOW,
-    BLUE
-}
-
-public class Defense extends ApplicationAdapter {
+public class Attack extends ApplicationAdapter {
 
     private SpriteBatch batch;
 
@@ -59,7 +54,7 @@ public class Defense extends ApplicationAdapter {
     private ImageButton purpleButton;
     public ActionResolver act;
 
-    public Defense(ActionResolver actionResolver) {
+    public Attack(ActionResolver actionResolver) {
         this.act = actionResolver;
     }
 
@@ -74,7 +69,7 @@ public class Defense extends ApplicationAdapter {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        swordSpeed = 0.001f*Gdx.graphics.getWidth(); // 10 pixels per second.
+        swordSpeed = 0.2f*Gdx.graphics.getWidth(); // 10 pixels per second.
 
         applicationAtlas = new TextureAtlas("data/buttons.pack");
         applicationSkin = new Skin();
