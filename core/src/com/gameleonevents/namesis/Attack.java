@@ -33,6 +33,8 @@ import javax.xml.soap.Text;
 
 public class Attack extends ApplicationAdapter {
 
+    private final String gemsSequence = "GPYBGGYPBBGY";
+
     private SpriteBatch batch;
 
     private TextureAtlas applicationAtlas;
@@ -41,9 +43,20 @@ public class Attack extends ApplicationAdapter {
 
     private Sprite background;
     private Sprite sword;
+
+    private Sprite blueStone;
+    private Sprite yellowStone;
+    private Sprite purpleStone;
+    private Sprite greenStone;
+
     float swordSpeed;
     float swordX;
-    float swordY;
+
+    int stoneIndex;
+
+    //Gems size management
+    private int gemSize;
+    private int startPos;
 
     private GameState gameState;
     private OrthographicCamera camera;
@@ -69,13 +82,22 @@ public class Attack extends ApplicationAdapter {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
+        gemSize = new Double(Gdx.graphics.getWidth() * 0.05f).intValue();
+        startPos = new Double(Gdx.graphics.getWidth() * 0.2f).intValue();
+
         swordSpeed = 0.2f*Gdx.graphics.getWidth(); // 10 pixels per second.
+        stoneIndex = 0;
 
         applicationAtlas = new TextureAtlas("data/buttons.pack");
         applicationSkin = new Skin();
         applicationSkin.addRegions(applicationAtlas);
+
         sword = new Sprite(new Texture("data/sword.png"));
         background = new Sprite(new Texture("data/defense_background.png"));
+        blueStone = new Sprite(new Texture("data/blue_stone.png"));
+        yellowStone = new Sprite(new Texture("data/yellow_stone.png"));
+        purpleStone = new Sprite(new Texture("data/purple_stone.png"));
+        greenStone = new Sprite(new Texture("data/green_stone.png"));
 
         InitializeButtons();
 
@@ -87,16 +109,24 @@ public class Attack extends ApplicationAdapter {
     {
         if(gameState == GameState.INGAME)
         {
-            if(sword.getX() <= Gdx.graphics.getWidth()*0.10f)
-                swordX += Gdx.graphics.getDeltaTime() * swordSpeed;
-            else if (sword.getX() >= Gdx.graphics.getWidth()*0.60f)
-                swordX -= Gdx.graphics.getDeltaTime() * swordSpeed;
+            //if(sword.getX() <= Gdx.graphics.getWidth()*0.10f)
+            //    swordX += Gdx.graphics.getDeltaTime() * swordSpeed;
+            //else if (sword.getX() >= Gdx.graphics.getWidth()*0.60f)
+            //    swordX -= Gdx.graphics.getDeltaTime() * swordSpeed;
             Gdx.gl.glClearColor(1, 0, 0, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
             batch.begin();
             batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            batch.draw(sword, swordX, Gdx.graphics.getHeight()*0.60f, Gdx.graphics.getWidth()*0.09f, Gdx.graphics.getHeight()*0.3f);
+            batch.draw(sword, swordX, Gdx.graphics.getHeight() * 0.60f, Gdx.graphics.getWidth() * 0.09f, Gdx.graphics.getHeight() * 0.3f);
+            if(stoneIndex < 12){
+                for(char c : gemsSequence.toCharArray()){
+                    batch.draw(blueStone, (startPos + gemSize * stoneIndex), new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+                    System.out.println("Pierre placée en " + (startPos + gemSize * stoneIndex));
+                    stoneIndex ++;
+                    System.out.println(stoneIndex + " pierre(s) placée(s)");
+                }
+            }
             batch.end();
             batch.begin();
             stage.draw();
