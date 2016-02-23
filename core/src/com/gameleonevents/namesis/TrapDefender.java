@@ -21,7 +21,7 @@ import java.util.Map;
  * Created by Pierre on 12/02/2016.
  */
 
-public class TrapAttacker extends ApplicationAdapter{
+public class TrapDefender extends ApplicationAdapter{
 
     private GameState gameState;
 
@@ -42,7 +42,7 @@ public class TrapAttacker extends ApplicationAdapter{
 
     //Initializing sounds, plus the boolean to avoid looping on frames
     private Sound trapSetting;
-    private Sound trapSet;
+    private Sound trapFree;
     private Sound endTimer;
 
     private boolean isEndTimerPlayed = false;
@@ -76,11 +76,11 @@ public class TrapAttacker extends ApplicationAdapter{
         fillBarImage = new Texture("data/fill_bar.png");
         fillBarSprite = new Sprite(fillBarImage);
 
-        trapImage = new Texture("data/trap5.png");
+        trapImage = new Texture("data/trap0.png");
         trapSprite = new Sprite(trapImage);
 
         trapSetting = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/setting_trap.mp3"));
-        trapSet = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/trap_set.mp3"));
+        trapFree = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/trap_free.mp3"));
         endTimer = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/end_timer.mp3"));
 
         camera = new OrthographicCamera();
@@ -107,7 +107,7 @@ public class TrapAttacker extends ApplicationAdapter{
         iLoops = 0;
         hasClicked = false;
 
-        iTrapIndex = 5;
+        iTrapIndex = 0;
 
         gameState = GameState.INGAME;
     }
@@ -140,8 +140,8 @@ public class TrapAttacker extends ApplicationAdapter{
                     if (touchPos.y > trapSprite.getY() && touchPos.y < trapSprite.getY() + trapSprite.getHeight()) {
                         if(iLoops == 0){
                             hasClicked = true;
-                            if(iTrapIndex > 0){
-                                iTrapIndex --;
+                            if(iTrapIndex < 5){
+                                iTrapIndex ++;
                                 trapSetting.play(0.5f);
                                 trapImage = new Texture("data/trap" + iTrapIndex + ".png");
                             }
@@ -150,14 +150,16 @@ public class TrapAttacker extends ApplicationAdapter{
                 }
             }
 
-            if(iTrapIndex == 0){
+            if(iTrapIndex == 5){
                 if(!isTrapSet){
                     isTrapSet = true;
-                    trapSet.play(0.5f);
+                    trapFree.play(0.5f);
                 }
                 NotifyWin();
             }
             trapSprite = new Sprite(trapImage);
+
+            System.out.println("Index : " + iTrapIndex);
 
             batch.begin();
             batch.draw(backgroundSprite, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -187,12 +189,13 @@ public class TrapAttacker extends ApplicationAdapter{
     }
 
     public void NotifyWin(){
-        gameState = GameState.STOPPED;
         won = true;
+        gameState = GameState.STOPPED;
+
     }
 
     public void NotifyLoose(){
-        gameState = GameState.STOPPED;
         lost = true;
+        gameState = GameState.STOPPED;
     }
 }
