@@ -46,6 +46,9 @@ public class Defense extends ApplicationAdapter {
 
     private Sprite background;
     private Sprite sword;
+    float swordSpeed = 0.001f*Gdx.graphics.getWidth(); // 10 pixels per second.
+    float swordX;
+    float swordY;
 
     private GameState gameState;
     private OrthographicCamera camera;
@@ -87,12 +90,16 @@ public class Defense extends ApplicationAdapter {
     {
         if(gameState == GameState.INGAME)
         {
+            if(sword.getX() <= Gdx.graphics.getWidth()*0.10f)
+                swordX += Gdx.graphics.getDeltaTime() * swordSpeed;
+            else if (sword.getX() >= Gdx.graphics.getWidth()*0.60f)
+                swordX -= Gdx.graphics.getDeltaTime() * swordSpeed;
             Gdx.gl.glClearColor(1, 0, 0, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
             batch.begin();
             batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            batch.draw(sword, Gdx.graphics.getWidth()*0.25f, Gdx.graphics.getHeight()*0.65f, Gdx.graphics.getWidth()*0.1f, Gdx.graphics.getHeight()*0.2f);
+            batch.draw(sword, swordX, Gdx.graphics.getHeight()*0.60f, Gdx.graphics.getWidth()*0.09f, Gdx.graphics.getHeight()*0.3f);
             batch.end();
             batch.begin();
             stage.draw();
@@ -178,12 +185,9 @@ public class Defense extends ApplicationAdapter {
         stage.addActor(purpleButton);
     }
 
-<<<<<<< HEAD
-    public void InitializeGame(){
-=======
+
     public void SpawnBrick(BrickColor color)
     {
->>>>>>> origin/master
 
     }
 
