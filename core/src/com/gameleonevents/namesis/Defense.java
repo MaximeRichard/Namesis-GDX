@@ -1,4 +1,4 @@
-package maje.gameleon.hunterd;
+package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -38,6 +39,7 @@ public class Defense extends ApplicationAdapter {
     private Stage stage;
 
     private Sprite background;
+    private Sprite sword;
 
     private GameState gameState;
     private OrthographicCamera camera;
@@ -46,13 +48,17 @@ public class Defense extends ApplicationAdapter {
     private ImageButton yellowButton;
     private ImageButton greenButton;
     private ImageButton purpleButton;
+    public ActionResolver act;
 
+    public Defense(ActionResolver actionResolver) {
+        this.act = actionResolver;
+    }
 
     @Override
     public void create()
     {
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);
+        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         batch = new SpriteBatch();
 
@@ -62,7 +68,7 @@ public class Defense extends ApplicationAdapter {
         applicationAtlas = new TextureAtlas("data/buttons.pack");
         applicationSkin = new Skin();
         applicationSkin.addRegions(applicationAtlas);
-
+        sword = new Sprite(new Texture("data/sword.png"));
         background = new Sprite(new Texture("data/defense_background.png"));
 
         InitializeButtons();
@@ -79,7 +85,8 @@ public class Defense extends ApplicationAdapter {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
             batch.begin();
-            batch.draw(background, 0, 0, 800, 480);
+            batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.draw(sword, Gdx.graphics.getWidth()*0.25f, Gdx.graphics.getHeight()*0.65f, Gdx.graphics.getWidth()*0.1f, Gdx.graphics.getHeight()*0.2f);
             batch.end();
             batch.begin();
             stage.draw();
@@ -91,10 +98,12 @@ public class Defense extends ApplicationAdapter {
     {
         //Initialize blue button
         ImageButton.ImageButtonStyle blueButtonStyle = new ImageButton.ImageButtonStyle();
-        blueButtonStyle.imageUp = applicationSkin.getDrawable("blue_orb");
-
+        Drawable drawButton = applicationSkin.getDrawable("blue_orb");
+        drawButton.setMinHeight((drawButton.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+        drawButton.setMinWidth((drawButton.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+        blueButtonStyle.imageUp = drawButton;
         blueButton = new ImageButton(blueButtonStyle);
-        blueButton.setPosition(620, 80);
+        blueButton.setPosition(Gdx.graphics.getWidth()*0.83f, Gdx.graphics.getHeight()*0.15f);
 
         blueButton.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
@@ -107,10 +116,13 @@ public class Defense extends ApplicationAdapter {
 
         //Initialize yellow button
         ImageButton.ImageButtonStyle yellowButtonStyle = new ImageButton.ImageButtonStyle();
-        yellowButtonStyle.imageUp = applicationSkin.getDrawable("yellow_orb");
+        drawButton = applicationSkin.getDrawable("yellow_orb");
+        drawButton.setMinHeight((drawButton.getMinHeight() * Gdx.graphics.getHeight()*0.0016f));
+        drawButton.setMinWidth((drawButton.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+        yellowButtonStyle.imageUp = drawButton;
 
         yellowButton = new ImageButton(yellowButtonStyle);
-        yellowButton.setPosition(20, 80);
+        yellowButton.setPosition(Gdx.graphics.getWidth()*0.01f, Gdx.graphics.getHeight()*0.15f);
 
         yellowButton.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
@@ -123,10 +135,13 @@ public class Defense extends ApplicationAdapter {
 
         //Initialize green button
         ImageButton.ImageButtonStyle greenButtonStyle = new ImageButton.ImageButtonStyle();
-        greenButtonStyle.imageUp = applicationSkin.getDrawable("green_orb");
+        drawButton = applicationSkin.getDrawable("green_orb");
+        drawButton.setMinHeight((drawButton.getMinHeight() * Gdx.graphics.getHeight()*0.0016f));
+        drawButton.setMinWidth((drawButton.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+        greenButtonStyle.imageUp = drawButton;
 
         greenButton = new ImageButton(greenButtonStyle);
-        greenButton.setPosition(190, 20);
+        greenButton.setPosition(Gdx.graphics.getWidth()*0.15f, Gdx.graphics.getHeight()*0.01f);
 
         greenButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -139,10 +154,13 @@ public class Defense extends ApplicationAdapter {
 
         //Initialize green button
         ImageButton.ImageButtonStyle purpleButtonStyle = new ImageButton.ImageButtonStyle();
-        purpleButtonStyle.imageUp = applicationSkin.getDrawable("purple_orb");
+        drawButton = applicationSkin.getDrawable("purple_orb");
+        drawButton.setMinHeight((drawButton.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+        drawButton.setMinWidth((drawButton.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+        purpleButtonStyle.imageUp = drawButton;
 
         purpleButton = new ImageButton(purpleButtonStyle);
-        purpleButton.setPosition(470, 20);
+        purpleButton.setPosition(Gdx.graphics.getWidth()*0.70f, Gdx.graphics.getHeight()*0.01f);
 
         purpleButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -152,6 +170,10 @@ public class Defense extends ApplicationAdapter {
         });
 
         stage.addActor(purpleButton);
+    }
+
+    public void InitializeGame(){
+
     }
 
     public void NotifyWin()
