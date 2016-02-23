@@ -19,6 +19,16 @@ public class ActionResolverAndroid implements ActionResolver {
     //paramètre de classe statique pour faire passer les infos du beacon detecté
     public static String beaconInfo;
 
+    public static String getBeaconId() {
+        return beaconId;
+    }
+
+    public static void setBeaconId(String beaconId) {
+        ActionResolverAndroid.beaconId = beaconId;
+    }
+
+    public static String beaconId;
+
     public static String getBeaconInfo() {
         return beaconInfo;
     }
@@ -74,6 +84,7 @@ public class ActionResolverAndroid implements ActionResolver {
             @Override
             public void onUpdateBeacon(ArrayList<Beacon> beacons) {
                 for(Beacon beacon:beacons){
+                    setBeaconId(beacon.getSerialNumber());
                     setBeaconInfo(beacon.getProximity().toString());
                 }
             }
@@ -98,6 +109,10 @@ public class ActionResolverAndroid implements ActionResolver {
         else return getBeaconInfo();
     }
 
-
+    @Override
+    public String SendBeaconId(){
+        if(getBeaconId() == null) return "No ID";
+        else return getBeaconId();
+    }
 
     }

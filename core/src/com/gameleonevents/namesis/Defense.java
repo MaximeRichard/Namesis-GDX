@@ -8,22 +8,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
-import javax.xml.soap.Text;
 
 /**
  * Created by Pierre on 17/02/2016.
@@ -46,13 +37,13 @@ public class Defense extends ApplicationAdapter {
 
     private Sprite background;
     private Sprite sword;
-    float swordSpeed = 0.001f*Gdx.graphics.getWidth(); // 10 pixels per second.
+    float swordSpeed; // 10 pixels per second.
     float swordX;
     float swordY;
 
     private GameState gameState;
     private OrthographicCamera camera;
-
+    private boolean sens = false;
     private ImageButton blueButton;
     private ImageButton yellowButton;
     private ImageButton greenButton;
@@ -68,7 +59,7 @@ public class Defense extends ApplicationAdapter {
     {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
+        swordSpeed = 0.3f*Gdx.graphics.getWidth();
         batch = new SpriteBatch();
 
         stage = new Stage(new ScreenViewport());
@@ -90,20 +81,30 @@ public class Defense extends ApplicationAdapter {
     {
         if(gameState == GameState.INGAME)
         {
-            if(sword.getX() <= Gdx.graphics.getWidth()*0.10f)
-                swordX += Gdx.graphics.getDeltaTime() * swordSpeed;
-            else if (sword.getX() >= Gdx.graphics.getWidth()*0.60f)
-                swordX -= Gdx.graphics.getDeltaTime() * swordSpeed;
+            if(sword.getX() <= Gdx.graphics.getWidth()*0.80f && sens == false) {
+                sword.setX(sword.getX()+Gdx.graphics.getDeltaTime() * swordSpeed);
+            }
+            else if (sword.getX() >= Gdx.graphics.getWidth()*0.10f && sens == true) {
+                sword.setX(sword.getX()-Gdx.graphics.getDeltaTime() * swordSpeed);
+            }
+            Gdx.app.log("My Tag", sword.getX()+"");
             Gdx.gl.glClearColor(1, 0, 0, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
             batch.begin();
             batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            batch.draw(sword, swordX, Gdx.graphics.getHeight()*0.60f, Gdx.graphics.getWidth()*0.09f, Gdx.graphics.getHeight()*0.3f);
+            batch.draw(sword, sword.getX(), Gdx.graphics.getHeight()*0.60f, Gdx.graphics.getWidth()*0.09f, Gdx.graphics.getHeight()*0.3f);
             batch.end();
             batch.begin();
             stage.draw();
             batch.end();
+
+            if(sword.getX() >= Gdx.graphics.getWidth()*0.80f && sens == false) {
+                sens = true;
+            }
+            else if (sword.getX() <= Gdx.graphics.getWidth()*0.10f && sens == true) {
+                sens = false;
+            }
         }
     }
 

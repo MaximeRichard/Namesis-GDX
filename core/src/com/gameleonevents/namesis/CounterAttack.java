@@ -71,6 +71,12 @@ public class CounterAttack extends ApplicationAdapter {
     private boolean shieldOpeningPlayed = false;
     private boolean counterHitPlayed = false;
 
+    public ActionResolver act;
+
+    public CounterAttack(ActionResolver actionResolver) {
+        this.act = actionResolver;
+    }
+
     @Override
     public void create () {
         batch = new SpriteBatch();
@@ -117,7 +123,9 @@ public class CounterAttack extends ApplicationAdapter {
         if(gameState == GameState.INGAME) {
             Gdx.gl.glClearColor(1, 0, 0, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+            //Gdx.app.log("My Tag", act.SendBeaconId());
+            if(act.SendBeaconInfo() == "PROXIMITY_IMMEDIATE" || act.SendBeaconInfo() == "PROXIMITY_NEAR")
+                vulnerabiltyDuration = vulnerabiltyTimer + 1.5f;
             //Listen for a click on the enemy sprite
             if (Gdx.input.isTouched()) {
                 touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
