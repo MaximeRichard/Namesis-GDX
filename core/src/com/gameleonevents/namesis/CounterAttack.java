@@ -101,9 +101,9 @@ public class CounterAttack extends ApplicationAdapter {
         elapsedTime = 0;
 
         //Dynamically assign the height, width, x pos and y pos of the enemy based on the screen size
-        enemySpriteSize = new Double(Gdx.graphics.getWidth() * 0.3).intValue();
-        enemyPosX = new Double(Gdx.graphics.getWidth() * 0.35).intValue();
-        enemyPosY = new Double(Gdx.graphics.getHeight() * 0.24).intValue();
+        enemySpriteSize = new Double(Gdx.graphics.getWidth() * 0.4).intValue();
+        enemyPosX = new Double(Gdx.graphics.getWidth() * 0.3).intValue();
+        enemyPosY = new Double(Gdx.graphics.getHeight() * 0.12).intValue();
 
         //Initializing sounds
         shieldHit = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/hit_shield.mp3"));
