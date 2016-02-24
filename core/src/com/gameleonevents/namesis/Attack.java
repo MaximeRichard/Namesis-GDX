@@ -1,4 +1,4 @@
-﻿package com.gameleonevents.namesis;
+package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -115,7 +115,6 @@ public class Attack extends ApplicationAdapter {
             batch.begin();
             batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.draw(sword, swordX, Gdx.graphics.getHeight() * 0.60f, Gdx.graphics.getWidth() * 0.09f, Gdx.graphics.getHeight() * 0.3f);
-
             batch.draw(gems.get(0), startPos, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
             batch.draw(gems.get(1), startPos + gemSize, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
             batch.draw(gems.get(2), startPos + gemSize * 2, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
@@ -128,15 +127,12 @@ public class Attack extends ApplicationAdapter {
             batch.draw(gems.get(9), startPos + gemSize * 9, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
             batch.draw(gems.get(10), startPos + gemSize * 10, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
             batch.draw(gems.get(11), startPos + gemSize * 11, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
-
             batch.end();
-
             batch.begin();
             stage.draw();
             batch.end();
         }
     }
-
     public void InitializeButtons()
     {
         //Initialize blue button
