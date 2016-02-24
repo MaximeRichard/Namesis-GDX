@@ -1,4 +1,4 @@
-﻿package com.gameleonevents.namesis;
+package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -16,8 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import java.awt.Image;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 /**
@@ -43,7 +41,6 @@ public class Attack extends ApplicationAdapter
 
     //Gems management
     private int gemSize;
-    private int startPos;
     private LinkedList<Texture> images;
     private LinkedList<Gem> gems;
 
@@ -75,7 +72,6 @@ public class Attack extends ApplicationAdapter
         Gdx.input.setInputProcessor(stage);
 
         gemSize = new Double(Gdx.graphics.getWidth() * 0.066f).intValue();
-        startPos = new Double(Gdx.graphics.getWidth() * 0.1f).intValue();
 
         swordSpeed = 0.3f*Gdx.graphics.getWidth(); // 10 pixels per second.
         stoneIndex = 0;
