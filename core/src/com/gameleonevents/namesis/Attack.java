@@ -1,4 +1,4 @@
-package com.gameleonevents.namesis;
+﻿package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -8,24 +8,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import java.awt.Rectangle;
-
-import javax.xml.soap.Text;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 /**
  * Created by Pierre on 17/02/2016.
@@ -44,19 +36,16 @@ public class Attack extends ApplicationAdapter {
     private Sprite background;
     private Sprite sword;
 
-    private Sprite blueStone;
-    private Sprite yellowStone;
-    private Sprite purpleStone;
-    private Sprite greenStone;
-
     float swordSpeed;
     float swordX;
 
     int stoneIndex;
 
-    //Gems size management
+    //Gems management
     private int gemSize;
     private int startPos;
+    private LinkedList<Sprite> sprites;
+    private LinkedList<Sprite> gems;
 
     private GameState gameState;
     private OrthographicCamera camera;
@@ -82,8 +71,8 @@ public class Attack extends ApplicationAdapter {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        gemSize = new Double(Gdx.graphics.getWidth() * 0.05f).intValue();
-        startPos = new Double(Gdx.graphics.getWidth() * 0.2f).intValue();
+        gemSize = new Double(Gdx.graphics.getWidth() * 0.066f).intValue();
+        startPos = new Double(Gdx.graphics.getWidth() * 0.1f).intValue();
 
         swordSpeed = 0.2f*Gdx.graphics.getWidth(); // 10 pixels per second.
         stoneIndex = 0;
@@ -94,10 +83,17 @@ public class Attack extends ApplicationAdapter {
 
         sword = new Sprite(new Texture("data/sword.png"));
         background = new Sprite(new Texture("data/defense_background.png"));
-        blueStone = new Sprite(new Texture("data/blue_stone.png"));
-        yellowStone = new Sprite(new Texture("data/yellow_stone.png"));
-        purpleStone = new Sprite(new Texture("data/purple_stone.png"));
-        greenStone = new Sprite(new Texture("data/green_stone.png"));
+
+        sprites = new LinkedList<Sprite>();
+        sprites.add(new Sprite(new Texture("data/blue_stone.png")));
+        sprites.add(new Sprite(new Texture("data/yellow_stone.png")));
+        sprites.add(new Sprite(new Texture("data/purple_stone.png")));
+        sprites.add(new Sprite(new Texture("data/green_stone.png")));
+
+        gems = new LinkedList<Sprite>();
+        for(int i = 0; i < 12; i++){
+            gems.add(sprites.get(0 + (int) (Math.random() * 4)));
+        }
 
         InitializeButtons();
 
@@ -109,34 +105,35 @@ public class Attack extends ApplicationAdapter {
     {
         if(gameState == GameState.INGAME)
         {
-            //if(sword.getX() <= Gdx.graphics.getWidth()*0.10f)
-            //    swordX += Gdx.graphics.getDeltaTime() * swordSpeed;
-            //else if (sword.getX() >= Gdx.graphics.getWidth()*0.60f)
-            //    swordX -= Gdx.graphics.getDeltaTime() * swordSpeed;
+            if(sword.getX() <= Gdx.graphics.getWidth()*0.10f)
+                swordX += Gdx.graphics.getDeltaTime() * swordSpeed;
+            else if (sword.getX() >= Gdx.graphics.getWidth()*0.60f)
+                swordX -= Gdx.graphics.getDeltaTime() * swordSpeed;
             Gdx.gl.glClearColor(1, 0, 0, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
             batch.begin();
             batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.draw(sword, swordX, Gdx.graphics.getHeight() * 0.60f, Gdx.graphics.getWidth() * 0.09f, Gdx.graphics.getHeight() * 0.3f);
-            //batch.draw(blueStone, (startPos + gemSize * stoneIndex), new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
-            drawStones();
+
+            batch.draw(gems.get(0), startPos, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            batch.draw(gems.get(1), startPos + gemSize, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            batch.draw(gems.get(2), startPos + gemSize * 2, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            batch.draw(gems.get(3), startPos + gemSize * 3, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            batch.draw(gems.get(4), startPos + gemSize * 4, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            batch.draw(gems.get(5), startPos + gemSize * 5, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            batch.draw(gems.get(6), startPos + gemSize * 6, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            batch.draw(gems.get(7), startPos + gemSize * 7, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            batch.draw(gems.get(8), startPos + gemSize * 8, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            batch.draw(gems.get(9), startPos + gemSize * 9, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            batch.draw(gems.get(10), startPos + gemSize * 10, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            batch.draw(gems.get(11), startPos + gemSize * 11, new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+
             batch.end();
+
             batch.begin();
             stage.draw();
             batch.end();
-        }
-    }
-
-    public void drawStones(){
-        if(stoneIndex < 12){
-            for(char c : gemsSequence.toCharArray()){
-                Gdx.app.log("My Tag", c+"");
-                batch.draw(blueStone, (startPos + gemSize * stoneIndex), new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
-                System.out.println("Pierre placée en " + (startPos + gemSize * stoneIndex));
-                stoneIndex ++;
-                System.out.println(stoneIndex + " pierre(s) placée(s)");
-            }
         }
     }
 
