@@ -5,5 +5,5 @@ package com.gameleonevents.namesis;
  */
 public interface ActionResolver {
     public String SendBeaconInfo();
-    public String SendBeaconId();
+    public String SendBeaconDistance();
 }

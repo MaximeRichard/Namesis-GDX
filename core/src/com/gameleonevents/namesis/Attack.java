@@ -119,18 +119,24 @@ public class Attack extends ApplicationAdapter {
             batch.begin();
             batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.draw(sword, swordX, Gdx.graphics.getHeight() * 0.60f, Gdx.graphics.getWidth() * 0.09f, Gdx.graphics.getHeight() * 0.3f);
-            if(stoneIndex < 12){
-                for(char c : gemsSequence.toCharArray()){
-                    batch.draw(blueStone, (startPos + gemSize * stoneIndex), new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
-                    System.out.println("Pierre placée en " + (startPos + gemSize * stoneIndex));
-                    stoneIndex ++;
-                    System.out.println(stoneIndex + " pierre(s) placée(s)");
-                }
-            }
+            //batch.draw(blueStone, (startPos + gemSize * stoneIndex), new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+            drawStones();
             batch.end();
             batch.begin();
             stage.draw();
             batch.end();
+        }
+    }
+
+    public void drawStones(){
+        if(stoneIndex < 12){
+            for(char c : gemsSequence.toCharArray()){
+                Gdx.app.log("My Tag", c+"");
+                batch.draw(blueStone, (startPos + gemSize * stoneIndex), new Double(Gdx.graphics.getHeight() * 0.5f).intValue(), gemSize, gemSize);
+                System.out.println("Pierre placée en " + (startPos + gemSize * stoneIndex));
+                stoneIndex ++;
+                System.out.println(stoneIndex + " pierre(s) placée(s)");
+            }
         }
     }
 
