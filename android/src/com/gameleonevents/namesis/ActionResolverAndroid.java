@@ -19,15 +19,15 @@ public class ActionResolverAndroid implements ActionResolver {
     //paramètre de classe statique pour faire passer les infos du beacon detecté
     public static String beaconInfo;
 
-    public static String getBeaconId() {
-        return beaconId;
+    public static String getBeaconDistance() {
+        return beaconDistance;
     }
 
-    public static void setBeaconId(String beaconId) {
-        ActionResolverAndroid.beaconId = beaconId;
+    public static void setBeaconDistance(String beaconDistance) {
+        ActionResolverAndroid.beaconDistance = beaconDistance;
     }
 
-    public static String beaconId;
+    public static String beaconDistance;
 
     public static String getBeaconInfo() {
         return beaconInfo;
@@ -72,7 +72,7 @@ public class ActionResolverAndroid implements ActionResolver {
 
     private boolean isBlueEnable() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        boolean status = bluetoothAdapter.isEnabled();
+            boolean status = bluetoothAdapter.isEnabled();
 
         return status;
     }
@@ -84,7 +84,7 @@ public class ActionResolverAndroid implements ActionResolver {
             @Override
             public void onUpdateBeacon(ArrayList<Beacon> beacons) {
                 for(Beacon beacon:beacons){
-                    setBeaconId(beacon.getSerialNumber());
+                    setBeaconDistance(beacon.getAccuracy()+"");
                     setBeaconInfo(beacon.getProximity().toString());
                 }
             }
@@ -110,9 +110,9 @@ public class ActionResolverAndroid implements ActionResolver {
     }
 
     @Override
-    public String SendBeaconId(){
-        if(getBeaconId() == null) return "No ID";
-        else return getBeaconId();
+    public String SendBeaconDistance(){
+        if(getBeaconDistance() == null) return "No ID";
+        else return getBeaconDistance();
     }
 
     }
