@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 /**
@@ -48,13 +49,13 @@ public class Defense extends ApplicationAdapter {
     private ImageButton purpleButton;
     public ActionResolver act;
 
-    private Gem gemSelected;
-    private int gemIndex;
+    private ColoredSword swordSelected;
+    private int swordIndex;
     private float timer;
-    private int gemsValidated;
+    private int defenceValidated;
 
     private LinkedList<String> imagesPath;
-    private LinkedList<Gem> gems;
+    private LinkedList<ColoredSword> swords;
 
     public Defense(ActionResolver actionResolver) {
         this.act = actionResolver;
@@ -75,21 +76,27 @@ public class Defense extends ApplicationAdapter {
         applicationSkin.addRegions(applicationAtlas);
         background = new Sprite(new Texture("data/defense_background.png"));
         timer = 0;
-        gemIndex = 0;
-        gemsValidated = 0;
+        swordIndex = 0;
+        defenceValidated = 0;
 
         imagesPath = new LinkedList<String>();
-        imagesPath.add("data/blue_stone.png");
-        imagesPath.add("data/yellow_stone.png");
-        imagesPath.add("data/purple_stone.png");
-        imagesPath.add("data/green_stone.png");
+        imagesPath.add("data/blue_sword.png");
+        imagesPath.add("data/yellow_sword.png");
+        imagesPath.add("data/purple_sword.png");
+        imagesPath.add("data/green_sword.png");
 
         InitializeButtons();
 
-        gems = new LinkedList<Gem>();
-        for(int i = 0; i < 12; i++){
-            int gemIndex = 0 + (int) (Math.random() * imagesPath.size());
-            gems.add(new Gem(imagesPath.get(gemIndex), 0, true));
+        swords = new LinkedList<ColoredSword>();
+
+        int iPreviousSwordIndex = 4;
+
+        while(swords.size() != 12){
+            int imageIndex = 0 + (int) (Math.random() * imagesPath.size());
+            if(imageIndex != iPreviousSwordIndex){
+                swords.add(new ColoredSword(imagesPath.get(imageIndex)));
+                iPreviousSwordIndex = imageIndex;
+            }
         }
 
         gameState = GameState.INGAME;
@@ -110,11 +117,13 @@ public class Defense extends ApplicationAdapter {
         
         if(gameState == GameState.INGAME)
         {
-            gemSelected = gems.get(gemIndex);
+            System.out.println(swords.size());
+
+            swordSelected = swords.get(swordIndex);
 
             batch.begin();
-            batch.draw(gemSelected, new Double((Gdx.graphics.getWidth() - gemSelected.getSize()) / 2).intValue(),
-                    new Double(Gdx.graphics.getHeight() * 0.2).intValue(), gemSelected.getSize(), gemSelected.getSize());
+            batch.draw(swordSelected, new Double(Gdx.graphics.getWidth() * 0.4).intValue(),
+                    new Double(Gdx.graphics.getHeight() * 0.2).intValue());
             batch.end();
 
             timer += Gdx.app.getGraphics().getDeltaTime();
@@ -123,7 +132,7 @@ public class Defense extends ApplicationAdapter {
                 NextGem();
             }
 
-            if(gemIndex == 11){
+            if(swordIndex == 11){
                 gameState = GameState.STOPPED;
             }
         }
@@ -131,7 +140,7 @@ public class Defense extends ApplicationAdapter {
 
     private void NextGem(){
         timer = 0;
-        gemIndex ++;
+        swordIndex ++;
     }
 
     public void InitializeButtons()
@@ -147,8 +156,8 @@ public class Defense extends ApplicationAdapter {
 
         blueButton.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
-               if(gemSelected.getGemColor() == GemColor.BLUE){
-                    gemsValidated++;
+               if(swordSelected.getSwordColor() == SwordColor.BLUE){
+                    defenceValidated++;
                }
                else
                    NextGem();
@@ -170,8 +179,8 @@ public class Defense extends ApplicationAdapter {
 
         yellowButton.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
-                if(gemSelected.getGemColor() == GemColor.YELLOW){
-                    gemsValidated++;
+                if(swordSelected.getSwordColor() == SwordColor.YELLOW){
+                    defenceValidated++;
                 }
                 else
                     NextGem();
@@ -193,8 +202,8 @@ public class Defense extends ApplicationAdapter {
 
         greenButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if(gemSelected.getGemColor() == GemColor.GREEN){
-                    gemsValidated++;
+                if(swordSelected.getSwordColor() == SwordColor.GREEN){
+                    defenceValidated++;
                 }
                 else
                     NextGem();
@@ -216,8 +225,8 @@ public class Defense extends ApplicationAdapter {
 
         purpleButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if(gemSelected.getGemColor() == GemColor.PURPLE){
-                    gemsValidated++;
+                if(swordSelected.getSwordColor() == SwordColor.PURPLE){
+                    defenceValidated++;
                 }
                 else
                     NextGem();
@@ -227,7 +236,6 @@ public class Defense extends ApplicationAdapter {
 
         stage.addActor(purpleButton);
     }
-
 
     public void NotifyEnd()
     {

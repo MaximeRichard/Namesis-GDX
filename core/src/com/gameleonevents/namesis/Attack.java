@@ -2,6 +2,7 @@ package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -36,6 +37,11 @@ public class Attack extends ApplicationAdapter
     //Text to give the user a feedback
     private BitmapFont scoreFont;
     private BitmapFont gameFont;
+
+    //Sounds
+    private Sound gemHit;
+    private Sound gemMissed;
+    private Sound wrongGem;
 
     private TextureAtlas applicationAtlas;
     private Skin applicationSkin;
@@ -98,6 +104,11 @@ public class Attack extends ApplicationAdapter
         Gdx.input.setInputProcessor(stage);
 
         gemSize = new Double(Gdx.graphics.getWidth() * 0.066f).intValue();
+
+        //Initializing sounds
+        gemHit = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/gem_hit.mp3"));
+        gemMissed = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/gem_missed.mp3"));
+        wrongGem = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/wrong_hit.mp3"));
 
         swordSpeed = swordMoveSpeed * Gdx.graphics.getWidth(); // 10 pixels per second.
         timer = 0;
@@ -202,7 +213,7 @@ public class Attack extends ApplicationAdapter
         batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.draw(sword, sword.getX(), Gdx.graphics.getHeight()*0.43f + gemSize, Gdx.graphics.getWidth()*0.09f, Gdx.graphics.getHeight()*0.3f);
         scoreFont.draw(batch, new Integer(bricksValidated).toString(), new Double(Gdx.graphics.getWidth() * 0.92).intValue(), new Double(Gdx.graphics.getHeight() * 0.965).intValue());
-        gameFont.draw(batch, gameTextString, new Double(Gdx.graphics.getWidth() * 0.36).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
+        gameFont.draw(batch, gameTextString, new Double(Gdx.graphics.getWidth() * 0.35).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
         gameFont.draw(batch, countdownText, new Double(Gdx.graphics.getWidth() * 0.5).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
 
         batch.end();
@@ -247,8 +258,16 @@ public class Attack extends ApplicationAdapter
     private void LockSword(){
         timeLocked = 0;
         sword.setSwordState(SwordState.LOCKED);
-        //CHANGE SWORD SPRITE TO MOVING
+        //CHANGE SWORD SPRITE TO LOCKED
     }
+
+    private boolean CheckIfGem(int gemIndex){
+        if(!gems.get(gemIndex).GetDisplayed()){
+            gemMissed.play(0.5f);
+        }
+        return gems.get(gemIndex).GetDisplayed();
+    }
+
     public void InitializeButtons()
     {
         //Initialize blue button
@@ -263,16 +282,22 @@ public class Attack extends ApplicationAdapter
         blueButton.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 System.out.println("Click sur blue button");
-                int gemIndex = CheckCollision();
-                if(gemIndex != -1){
-                    if(gems.get(gemIndex).getGemColor() == GemColor.BLUE){
-                        if(gems.get(gemIndex).GetDisplayed()){
-                            bricksValidated++;
-                            gems.get(gemIndex).setDisplayed(false);
+                if(gameState == GameState.INGAME){
+                    int gemIndex = CheckCollision();
+                    if(gemIndex != -1){
+                        if(CheckIfGem(gemIndex)){
+                            if(gems.get(gemIndex).getGemColor() == GemColor.BLUE){
+                                bricksValidated++;
+                                gemHit.play(0.5f);
+                                gems.get(gemIndex).setDisplayed(false);
+
+                            }
+                            else{
+                                wrongGem.play(0.5f);
+                                LockSword();
+                            }
                         }
                     }
-                    else
-                        LockSword();
                 }
                 return true;
             }
@@ -293,16 +318,22 @@ public class Attack extends ApplicationAdapter
         yellowButton.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 System.out.println("Click sur yellow button");
-                int gemIndex = CheckCollision();
-                if(gemIndex != -1){
-                    if(gems.get(gemIndex).getGemColor() == GemColor.YELLOW){
-                        if(gems.get(gemIndex).GetDisplayed()){
-                            bricksValidated++;
-                            gems.get(gemIndex).setDisplayed(false);
+                if(gameState == GameState.INGAME){
+                    int gemIndex = CheckCollision();
+                    if(gemIndex != -1){
+                        if(CheckIfGem(gemIndex)){
+                            if(gems.get(gemIndex).getGemColor() == GemColor.YELLOW){
+                                bricksValidated++;
+                                gemHit.play(0.5f);
+                                gems.get(gemIndex).setDisplayed(false);
+
+                            }
+                            else{
+                                wrongGem.play(0.5f);
+                                LockSword();
+                            }
                         }
                     }
-                    else
-                        LockSword();
                 }
                 return true;
             }
@@ -323,16 +354,22 @@ public class Attack extends ApplicationAdapter
         greenButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Click sur green button");
-                int gemIndex = CheckCollision();
-                if(gemIndex != -1){
-                    if(gems.get(gemIndex).getGemColor() == GemColor.GREEN){
-                        if(gems.get(gemIndex).GetDisplayed()){
-                            bricksValidated++;
-                            gems.get(gemIndex).setDisplayed(false);
+                if(gameState == GameState.INGAME){
+                    int gemIndex = CheckCollision();
+                    if(gemIndex != -1){
+                        if(CheckIfGem(gemIndex)){
+                            if(gems.get(gemIndex).getGemColor() == GemColor.GREEN){
+                                bricksValidated++;
+                                gemHit.play(0.5f);
+                                gems.get(gemIndex).setDisplayed(false);
+
+                            }
+                            else{
+                                wrongGem.play(0.5f);
+                                LockSword();
+                            }
                         }
                     }
-                    else
-                        LockSword();
                 }
                 return true;
             }
@@ -353,16 +390,22 @@ public class Attack extends ApplicationAdapter
         purpleButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Click sur purple button");
-                int gemIndex = CheckCollision();
-                if(gemIndex != -1){
-                    if(gems.get(gemIndex).getGemColor() == GemColor.PURPLE){
-                        if(gems.get(gemIndex).GetDisplayed()){
-                            bricksValidated++;
-                            gems.get(gemIndex).setDisplayed(false);
+                if(gameState == GameState.INGAME){
+                    int gemIndex = CheckCollision();
+                    if(gemIndex != -1){
+                        if(CheckIfGem(gemIndex)){
+                            if(gems.get(gemIndex).getGemColor() == GemColor.PURPLE){
+                                bricksValidated++;
+                                gemHit.play(0.5f);
+                                gems.get(gemIndex).setDisplayed(false);
+
+                            }
+                            else{
+                                wrongGem.play(0.5f);
+                                LockSword();
+                            }
                         }
                     }
-                    else
-                        LockSword();
                 }
                 return true;
             }
@@ -374,5 +417,6 @@ public class Attack extends ApplicationAdapter
     public void NotifyEnd()
     {
         gameState = GameState.STOPPED;
+        gameTextString = "Score final : " + bricksValidated + " points";
     }
 }

@@ -57,6 +57,7 @@ public class CounterAttack extends ApplicationAdapter {
 
     //Text to give the user a feedback
     private BitmapFont font;
+    String resultString;
 
     //Aspect variables
     private int enemySpriteSize;
@@ -100,6 +101,7 @@ public class CounterAttack extends ApplicationAdapter {
         enemyImage = new Texture("data/monster_shield_on.png");
 
         elapsedTime = 0;
+        resultString = "";
 
         //Dynamically assign the height, width, x pos and y pos of the enemy based on the screen size
         enemySpriteSize = new Double(Gdx.graphics.getWidth() * 0.4).intValue();
@@ -115,7 +117,7 @@ public class CounterAttack extends ApplicationAdapter {
         camera = new OrthographicCamera();
         camera.setToOrtho(true, enemySpriteSize, enemySpriteSize);
 
-        gameState = GameState.INGAME;
+        gameState = GameState.COUNTDOWN;
     }
 
     @Override
@@ -182,12 +184,12 @@ public class CounterAttack extends ApplicationAdapter {
             batch.draw(backgroundSprite, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
             batch.draw(enemySprite, enemyPosX, enemyPosY, enemySpriteSize, enemySpriteSize);
-            String resultString = "";
+
             if(won){
-                resultString = "Vous avez gagné !";
+                resultString = "L'ennemi est vaincu !";
             }
             if(lost){
-                resultString = "Vous avez perdu !";
+                resultString = "Vous avez échoué !";
             }
             font.draw(batch, resultString, new Double(Gdx.graphics.getWidth() * 0.36).intValue(),
                     new Double(Gdx.graphics.getHeight() * 0.92).intValue());
