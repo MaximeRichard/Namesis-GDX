@@ -25,7 +25,8 @@ enum EnemyState{
 
 enum GameState{
     INGAME,
-    STOPPED
+    STOPPED,
+    COUNTDOWN
 }
 
 public class CounterAttack extends ApplicationAdapter {

@@ -2,12 +2,15 @@ package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -26,22 +29,34 @@ public class Attack extends ApplicationAdapter
 {
     private SpriteBatch batch;
 
+    private final int limitTimer = 10;
+    private final float lockingTime = 0.5f;
+    private final float swordMoveSpeed = 0.5f;
+
+    //Text to give the user a feedback
+    private BitmapFont scoreFont;
+    private BitmapFont gameFont;
+
     private TextureAtlas applicationAtlas;
     private Skin applicationSkin;
     private Stage stage;
 
     private Sprite background;
-    private Sprite sword;
+    private Sword sword;
     private Sprite fillBarSprite;
 
     float swordSpeed;
-    private boolean sens = false;
 
-    int stoneIndex;
+    private int bricksValidated;
+    private float timeLocked;
+    private float countdown;
+
+    private String gameTextString;
+    private String countdownText;
 
     //Gems management
     private int gemSize;
-    private LinkedList<Texture> images;
+    private LinkedList<String> imagesPath;
     private LinkedList<Gem> gems;
 
     private GameState gameState;
@@ -63,6 +78,17 @@ public class Attack extends ApplicationAdapter
     @Override
     public void create()
     {
+        //Creating text using free type font generator. This allows to create
+        //bitmap font without any quality loss.
+        FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("data/HAMLETORNOT.TTF"));
+        FreeTypeFontGenerator.FreeTypeFontParameter fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        fontParameter.size = 30 * (Gdx.graphics.getWidth() / 800);
+        fontParameter.color = Color.WHITE;
+        scoreFont = fontGenerator.generateFont(fontParameter);
+        gameFont = fontGenerator.generateFont(fontParameter);
+
+        fontGenerator.dispose();
+
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -73,84 +99,150 @@ public class Attack extends ApplicationAdapter
 
         gemSize = new Double(Gdx.graphics.getWidth() * 0.066f).intValue();
 
-        swordSpeed = 0.3f*Gdx.graphics.getWidth(); // 10 pixels per second.
-        stoneIndex = 0;
+        swordSpeed = swordMoveSpeed * Gdx.graphics.getWidth(); // 10 pixels per second.
         timer = 0;
+        bricksValidated = 0;
         fillAmount = 1;
+        timeLocked = 0;
+        countdown = 5;
+        gameTextString = "";
+        countdownText = "";
 
         applicationAtlas = new TextureAtlas("data/buttons.pack");
         applicationSkin = new Skin();
         applicationSkin.addRegions(applicationAtlas);
 
-        sword = new Sprite(new Texture("data/sword.png"));
+        sword = new Sword();
         background = new Sprite(new Texture("data/attack_background.png"));
         fillBarSprite = new Sprite(new Texture("data/fill_bar.png"));
 
-        images = new LinkedList<Texture>();
-        images.add(new Texture("data/blue_stone.png"));
-        images.add(new Texture("data/yellow_stone.png"));
-        images.add(new Texture("data/purple_stone.png"));
-        images.add(new Texture("data/green_stone.png"));
+        imagesPath = new LinkedList<String>();
+        imagesPath.add("data/blue_stone.png");
+        imagesPath.add("data/yellow_stone.png");
+        imagesPath.add("data/purple_stone.png");
+        imagesPath.add("data/green_stone.png");
 
         gems = new LinkedList<Gem>();
         for(int i = 0; i < 12; i++){
-            int randImage = 0 + (int) (Math.random() * images.size());
-            gems.add(new Gem(images.get(randImage), i));
+            int randImage = 0 + (int) (Math.random() * imagesPath.size());
+            gems.add(new Gem(imagesPath.get(randImage), i, true));
         }
 
         InitializeButtons();
 
-        gameState = GameState.INGAME;
+        sword.setSwordState(SwordState.LOCKED);
+        gameState = GameState.COUNTDOWN;
     }
 
     @Override
     public void render()
     {
+        if(gameState == GameState.COUNTDOWN)
+        {
+            countdown -= Gdx.app.getGraphics().getDeltaTime();
+
+            if(countdown > 1){
+                countdownText = new Integer(new Double(Math.floor(countdown)).intValue()).toString();
+            }
+            else if(countdown <= 1 && countdown > 0){
+                countdownText = "";
+                gameTextString = "Détruis les gemmes !";
+            }
+            else{
+                gameTextString = "";
+                gameState = GameState.INGAME;
+            }
+        }
+
         if(gameState == GameState.INGAME)
         {
-            timer += Gdx.app.getGraphics().getDeltaTime();
-            fillAmount = new Double((10 - timer) / 10).floatValue();
-
-            if(sword.getX() <= Gdx.graphics.getWidth()*0.85f && sens == false) {
-                sword.setX(sword.getX()+Gdx.graphics.getDeltaTime() * swordSpeed);
-            }
-            else if (sword.getX() >= Gdx.graphics.getWidth()*0.05f && sens == true) {
-                sword.setX(sword.getX()-Gdx.graphics.getDeltaTime() * swordSpeed);
-            }
             Gdx.gl.glClearColor(1, 0, 0, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-            batch.begin();
-            batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            batch.draw(sword, sword.getX(), Gdx.graphics.getHeight()*0.43f + gemSize, Gdx.graphics.getWidth()*0.09f, Gdx.graphics.getHeight()*0.3f);
+            if(sword.getSwordState() == SwordState.MOVING)
+            {
+                if(sword.getX() <= Gdx.graphics.getWidth()*0.85f && sword.getDirection() == Direction.LEFT) {
+                    sword.setX(sword.getX()+Gdx.graphics.getDeltaTime() * swordSpeed);
+                }
+                else if (sword.getX() >= Gdx.graphics.getWidth()*0.05f && sword.getDirection() == Direction.RIGHT) {
+                    sword.setX(sword.getX()-Gdx.graphics.getDeltaTime() * swordSpeed);
+                }
 
-            for(int i = 0; i < gems.size(); i++){
-                Gem myGem = gems.get(i);
+                if(sword.getX() >= Gdx.graphics.getWidth()*0.85f && sword.getDirection() == Direction.LEFT) {
+                    sword.setDirection(Direction.RIGHT);
+                }
+                else if (sword.getX() <= Gdx.graphics.getWidth()*0.05f && sword.getDirection() == Direction.RIGHT) {
+                    sword.setDirection(Direction.LEFT);
+                }
+            }
+            else
+            {
+                timeLocked += Gdx.app.getGraphics().getDeltaTime();
+                if(timeLocked > lockingTime){
+                    sword.setSwordState(SwordState.MOVING);
+                    //CHANGE SWORD SPRITE TO MOVING
+                }
+            }
+
+            //Updating timer
+            timer += Gdx.app.getGraphics().getDeltaTime();
+            fillAmount = new Double((limitTimer - timer) / limitTimer).floatValue();
+
+            //Victory/Game end checkings
+            if(timer >= limitTimer){
+                NotifyEnd();
+            }
+
+            if(bricksValidated == 12){
+                NotifyEnd();
+            }
+
+            System.out.println(bricksValidated);
+        }
+
+        batch.begin();
+        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(sword, sword.getX(), Gdx.graphics.getHeight()*0.43f + gemSize, Gdx.graphics.getWidth()*0.09f, Gdx.graphics.getHeight()*0.3f);
+        scoreFont.draw(batch, new Integer(bricksValidated).toString(), new Double(Gdx.graphics.getWidth() * 0.92).intValue(), new Double(Gdx.graphics.getHeight() * 0.965).intValue());
+        gameFont.draw(batch, gameTextString, new Double(Gdx.graphics.getWidth() * 0.36).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
+        gameFont.draw(batch, countdownText, new Double(Gdx.graphics.getWidth() * 0.5).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
+
+        for(int i = 0; i < gems.size(); i++){
+            Gem myGem = gems.get(i);
+            if(myGem.GetDisplayed()){
                 batch.draw(myGem, myGem.getPositionX(), myGem.getPositionY(), myGem.getSize(), myGem.getSize());
             }
-
-            batch.draw(fillBarSprite, new Double(Gdx.graphics.getWidth() * 0.31).intValue(),
-                    new Double(Gdx.graphics.getHeight() * 0.925).intValue(),
-                    new Double((Gdx.graphics.getWidth() * 0.4) * fillAmount).intValue(),
-                    new Double(Gdx.graphics.getWidth() * 0.015).intValue());
-
-            batch.end();
-
-            batch.begin();
-            stage.draw();
-            batch.end();
-
-            if(sword.getX() >= Gdx.graphics.getWidth()*0.85f && sens == false) {
-                sens = true;
-            }
-            else if (sword.getX() <= Gdx.graphics.getWidth()*0.05f && sens == true) {
-                sens = false;
-            }
-
-            if(timer >= 10){
-                NotifyLoose();
-            }
         }
+
+        batch.draw(fillBarSprite, new Double(Gdx.graphics.getWidth() * 0.31).intValue(),
+                new Double(Gdx.graphics.getHeight() * 0.925).intValue(),
+                new Double((Gdx.graphics.getWidth() * 0.4) * fillAmount).intValue(),
+                new Double(Gdx.graphics.getWidth() * 0.015).intValue());
+
+        batch.end();
+
+        batch.begin();
+        stage.draw();
+        batch.end();
+    }
+
+    public int CheckCollision(){
+        int swordPosition = new Double(sword.getX() + sword.getWidth() / 2).intValue() - new Double(Gdx.graphics.getWidth() * 0.11f).intValue();
+        float swordPercentage = (swordPosition * 100) / Gdx.graphics.getWidth();
+
+        int gemIndex = new Double(Math.floor(new Float(swordPercentage / 6.6))).intValue();
+
+        if(gemIndex >= 0 && gemIndex <= 11){
+                return gemIndex;
+        }
+        else
+            return -1;
+    }
+
+    private void LockSword(){
+        timeLocked = 0;
+        sword.setSwordState(SwordState.LOCKED);
+        //CHANGE SWORD SPRITE TO MOVING
     }
 
     public void InitializeButtons()
@@ -167,6 +259,17 @@ public class Attack extends ApplicationAdapter
         blueButton.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 System.out.println("Click sur blue button");
+                int gemIndex = CheckCollision();
+                if(gemIndex != -1){
+                    if(gems.get(gemIndex).getGemColor() == GemColor.BLUE){
+                        if(gems.get(gemIndex).GetDisplayed()){
+                            bricksValidated++;
+                            gems.get(gemIndex).setDisplayed(false);
+                        }
+                    }
+                    else
+                        LockSword();
+                }
                 return true;
             }
         });
@@ -186,6 +289,17 @@ public class Attack extends ApplicationAdapter
         yellowButton.addListener(new InputListener(){
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 System.out.println("Click sur yellow button");
+                int gemIndex = CheckCollision();
+                if(gemIndex != -1){
+                    if(gems.get(gemIndex).getGemColor() == GemColor.YELLOW){
+                        if(gems.get(gemIndex).GetDisplayed()){
+                            bricksValidated++;
+                            gems.get(gemIndex).setDisplayed(false);
+                        }
+                    }
+                    else
+                        LockSword();
+                }
                 return true;
             }
         });
@@ -205,6 +319,17 @@ public class Attack extends ApplicationAdapter
         greenButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Click sur green button");
+                int gemIndex = CheckCollision();
+                if(gemIndex != -1){
+                    if(gems.get(gemIndex).getGemColor() == GemColor.GREEN){
+                        if(gems.get(gemIndex).GetDisplayed()){
+                            bricksValidated++;
+                            gems.get(gemIndex).setDisplayed(false);
+                        }
+                    }
+                    else
+                        LockSword();
+                }
                 return true;
             }
         });
@@ -224,6 +349,17 @@ public class Attack extends ApplicationAdapter
         purpleButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Click sur purple button");
+                int gemIndex = CheckCollision();
+                if(gemIndex != -1){
+                    if(gems.get(gemIndex).getGemColor() == GemColor.PURPLE){
+                        if(gems.get(gemIndex).GetDisplayed()){
+                            bricksValidated++;
+                            gems.get(gemIndex).setDisplayed(false);
+                        }
+                    }
+                    else
+                        LockSword();
+                }
                 return true;
             }
         });
@@ -231,12 +367,7 @@ public class Attack extends ApplicationAdapter
         stage.addActor(purpleButton);
     }
 
-    public void NotifyWin()
-    {
-        gameState = GameState.STOPPED;
-    }
-
-    public void NotifyLoose()
+    public void NotifyEnd()
     {
         gameState = GameState.STOPPED;
     }
