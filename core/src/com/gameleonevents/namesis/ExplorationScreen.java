@@ -1,6 +1,7 @@
 package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -12,10 +13,13 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 /**
@@ -26,6 +30,12 @@ enum PlayerMode{
     predateur,
     defenseur,
     fantome
+}
+
+enum BeaconMode{
+    active,
+    gray,
+    cooldown
 }
 
 public class ExplorationScreen implements Screen {
@@ -166,6 +176,34 @@ public class ExplorationScreen implements Screen {
             case "mode-fantome":
                 game.setScreen(new ModeScreen(game));
                 break;
+            case "predateur":
+                Skin uiSkin = new Skin(Gdx.files.internal("data/uiskin.json"));
+                Label label = new Label("Tap tiles to build a word and then press the blue button to play the word", uiSkin);
+                label.setWrap(true);
+                label.setFontScale(.8f);
+                label.setAlignment(Align.center);
+
+                Dialog dialog =
+                        new Dialog("", uiSkin, "dialog") {
+                            protected void result (Object object) {
+                                System.out.println("Chosen: " + object);
+                            }
+                        };
+
+                dialog.padTop(50).padBottom(50);
+                dialog.getContentTable().add(label).width(850).row();
+                dialog.getButtonTable().padTop(50);
+
+                TextButton dbutton = new TextButton("Yes", uiSkin, "dialog");
+                dialog.button(dbutton, true);
+
+                dbutton = new TextButton("No", uiSkin, "dialog");
+                dialog.button(dbutton, false);
+                dialog.key(Input.Keys.ENTER, true).key(Input.Keys.ESCAPE, false);
+                dialog.invalidateHierarchy();
+                dialog.invalidate();
+                dialog.layout();
+                dialog.show(stage);
             default:
                 break;
         }
