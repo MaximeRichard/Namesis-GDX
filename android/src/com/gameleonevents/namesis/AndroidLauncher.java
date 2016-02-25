@@ -19,7 +19,6 @@ public class AndroidLauncher extends AndroidApplication {
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		//initialize(new Attack(actionResolverAndroid), config);
 		initialize(new Defense(null), config);
-		//initialize(new CounterAttack(), config);
 	}
 
 }
