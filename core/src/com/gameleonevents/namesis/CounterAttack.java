@@ -41,6 +41,8 @@ public class CounterAttack extends ApplicationAdapter {
     private Texture enemyImage;
     private Sprite enemySprite;
 
+    private Sprite slashSprite;
+
     private EnemyState enemyState;
 
     //Variable used to handle the touch event
@@ -52,6 +54,7 @@ public class CounterAttack extends ApplicationAdapter {
     private double vulnerabiltyDuration;
     private double elapsedTime;
     private float countdown;
+    private boolean hasWon;
 
     //Text to give the user a feedback
     private BitmapFont font;
@@ -100,16 +103,18 @@ public class CounterAttack extends ApplicationAdapter {
 
         enemyState = EnemyState.DEFENDING;
         enemyImage = new Texture("data/monster_shield_on.png");
+        slashSprite = new Sprite(new Texture("data/slash.png"));
 
         elapsedTime = 0;
         countdown = 5;
         resultString = "";
         countdownText = "";
+        hasWon = false;
 
         //Dynamically assign the height, width, x pos and y pos of the enemy based on the screen size
         enemySpriteSize = new Double(Gdx.graphics.getWidth() * 0.4).intValue();
         enemyPosX = new Double(Gdx.graphics.getWidth() * 0.3).intValue();
-        enemyPosY = new Double(Gdx.graphics.getHeight() * 0.12).intValue();
+        enemyPosY = new Double(Gdx.graphics.getHeight() * 0.23).intValue();
 
         //Initializing sounds
         shieldHit = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/hit_shield.mp3"));
@@ -144,10 +149,6 @@ public class CounterAttack extends ApplicationAdapter {
         }
 
         if(gameState == GameState.INGAME) {
-
-            //if(act.SendBeaconInfo() == "PROXIMITY_IMMEDIATE" || act.SendBeaconInfo() == "PROXIMITY_NEAR")
-            //    vulnerabiltyDuration = vulnerabiltyTimer + 1.5f;
-            //Listen for a click on the enemy sprite
             if (Gdx.input.isTouched()) {
                 touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
                 camera.unproject(touchPos);
@@ -204,16 +205,23 @@ public class CounterAttack extends ApplicationAdapter {
 
         batch.draw(enemySprite, enemyPosX, enemyPosY, enemySpriteSize, enemySpriteSize);
 
-        font.draw(batch, resultString, new Double(Gdx.graphics.getWidth() * 0.275).intValue(),
-                new Double(Gdx.graphics.getHeight() * 0.94).intValue());
+        if(hasWon)
+            batch.draw(slashSprite, new Double(Gdx.graphics.getWidth() * 0.4).intValue(),
+                    new Double(Gdx.graphics.getHeight() * 0.3).intValue(),
+                    new Double(Gdx.graphics.getWidth() * 0.2).intValue(),
+                    new Double(Gdx.graphics.getHeight() * 0.5).intValue());
+
+        font.draw(batch, resultString, new Double(Gdx.graphics.getWidth() * 0.26).intValue(),
+                new Double(Gdx.graphics.getHeight() * 0.14).intValue());
         font.draw(batch, countdownText, new Double(Gdx.graphics.getWidth() * 0.5).intValue(),
-                new Double(Gdx.graphics.getHeight() * 0.94).intValue());
+                new Double(Gdx.graphics.getHeight() * 0.14).intValue());
         batch.end();
     }
 
     private void NotifyWin(){
         resultString = "Vous avez vaincu votre adversaire !";
         gameState = GameState.STOPPED;
+        hasWon = true;
     }
 
     private void NotifyLoose(){

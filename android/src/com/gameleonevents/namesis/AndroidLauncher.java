@@ -14,11 +14,11 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//Initialisation du Resolver
-		actionResolverAndroid = new ActionResolverAndroid(this);
+		//actionResolverAndroid = new ActionResolverAndroid(this);
         //Log.v("Test", actionResolverAndroid.toString());
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		//initialize(new Attack(actionResolverAndroid), config);
-		initialize(new NamesisGame(actionResolverAndroid), config);
+		initialize(new CounterAttack(null/*actionResolverAndroid*/), config);
 	}
 
 }
