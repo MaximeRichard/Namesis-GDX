@@ -196,8 +196,6 @@ public class Attack extends ApplicationAdapter
             if(bricksValidated == 12){
                 NotifyEnd();
             }
-
-            System.out.println(bricksValidated);
         }
 
         batch.begin();
@@ -206,6 +204,13 @@ public class Attack extends ApplicationAdapter
         scoreFont.draw(batch, new Integer(bricksValidated).toString(), new Double(Gdx.graphics.getWidth() * 0.92).intValue(), new Double(Gdx.graphics.getHeight() * 0.965).intValue());
         gameFont.draw(batch, gameTextString, new Double(Gdx.graphics.getWidth() * 0.36).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
         gameFont.draw(batch, countdownText, new Double(Gdx.graphics.getWidth() * 0.5).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
+
+        batch.end();
+        batch.begin();
+        stage.draw();
+        batch.end();
+
+        batch.begin();
 
         for(int i = 0; i < gems.size(); i++){
             Gem myGem = gems.get(i);
@@ -244,7 +249,6 @@ public class Attack extends ApplicationAdapter
         sword.setSwordState(SwordState.LOCKED);
         //CHANGE SWORD SPRITE TO MOVING
     }
-
     public void InitializeButtons()
     {
         //Initialize blue button
