@@ -37,6 +37,7 @@ public class TrapDefender extends ApplicationAdapter{
     private BitmapFont font;
 
     private double timer;
+    private float countdown;
 
     private int iTrapIndex;
 
@@ -53,12 +54,11 @@ public class TrapDefender extends ApplicationAdapter{
     private int posY;
 
     private boolean isTrapSet = false;
-    private boolean won = false;
-    private boolean lost = false;
 
     int iLoops;
     boolean hasClicked;
     private String resultString;
+    private String countdownText;
     private float fillAmount;
 
     //Variables used fo touch handling
@@ -88,6 +88,7 @@ public class TrapDefender extends ApplicationAdapter{
         touchPos = new Vector3();
 
         resultString = "";
+        countdownText = "";
         fillAmount = 1;
 
         //Creating text using free type font generator. This allows to create
@@ -106,15 +107,45 @@ public class TrapDefender extends ApplicationAdapter{
         timer = 0;
         iLoops = 0;
         hasClicked = false;
+        countdown = 5;
 
         iTrapIndex = 0;
 
-        gameState = GameState.INGAME;
+        gameState = GameState.COUNTDOWN;
     }
 
     @Override
     public void render()
     {
+        if(gameState == GameState.COUNTDOWN)
+        {
+            countdown -= Gdx.app.getGraphics().getDeltaTime();
+
+            if(countdown > 1){
+                countdownText = new Integer(new Double(Math.floor(countdown)).intValue()).toString();
+            }
+            else if(countdown <= 1 && countdown > 0){
+                countdownText = "";
+                resultString = "Désamorce le piege !";
+            }
+            else{
+                resultString = "";
+                gameState = GameState.INGAME;
+            }
+        }
+
+        batch.begin();
+        batch.draw(backgroundSprite, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(fillBarSprite, new Double(Gdx.graphics.getWidth() * 0.31).intValue(),
+                new Double(Gdx.graphics.getHeight() * 0.91).intValue(),
+                new Double((Gdx.graphics.getWidth() * 0.4) * fillAmount).intValue(),
+                new Double(Gdx.graphics.getWidth() * 0.015).intValue());
+        batch.draw(trapSprite, posX, posY, spriteSize, spriteSize);
+
+        font.draw(batch, resultString, new Double(Gdx.graphics.getWidth() * 0.33).intValue(), new Double(Gdx.graphics.getHeight() * 0.8).intValue());
+        font.draw(batch, countdownText, new Double(Gdx.graphics.getWidth() * 0.5).intValue(), new Double(Gdx.graphics.getHeight() * 0.8).intValue());
+        batch.end();
+
         if(gameState == GameState.INGAME)
         {
             timer += Gdx.app.getGraphics().getDeltaTime();
@@ -128,9 +159,6 @@ public class TrapDefender extends ApplicationAdapter{
             }
 
             fillAmount = new Double((3 - timer) / 3).floatValue();
-
-            Gdx.gl.glClearColor(1, 0, 0, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
             //Listen for a click on the trap sprite
             if (Gdx.input.isTouched()) {
@@ -161,27 +189,11 @@ public class TrapDefender extends ApplicationAdapter{
 
             System.out.println("Index : " + iTrapIndex);
 
-            batch.begin();
-            batch.draw(backgroundSprite, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            batch.draw(fillBarSprite, new Double(Gdx.graphics.getWidth() * 0.31).intValue(),
-                    new Double(Gdx.graphics.getHeight() * 0.91).intValue(),
-                    new Double((Gdx.graphics.getWidth() * 0.4) * fillAmount).intValue(),
-                    new Double(Gdx.graphics.getWidth() * 0.015).intValue());
-            batch.draw(trapSprite, posX, posY, spriteSize, spriteSize);
-            if(won){
-                resultString = "Vous avez gagné !";
-            }
-            if(lost){
-                resultString = "Vous avez perdu !";
-            }
-            font.draw(batch, resultString, new Double(Gdx.graphics.getWidth() * 0.38).intValue(), new Double(Gdx.graphics.getHeight() * 0.8).intValue());
-            batch.end();
-
             if(hasClicked){
                 iLoops++;
             }
 
-            if(iLoops >= 4){
+            if(iLoops >= 10){
                 hasClicked = false;
                 iLoops = 0;
             }
@@ -189,13 +201,13 @@ public class TrapDefender extends ApplicationAdapter{
     }
 
     public void NotifyWin(){
-        won = true;
+        resultString = "Le piege est désamorcé !";
         gameState = GameState.STOPPED;
 
     }
 
     public void NotifyLoose(){
-        lost = true;
+        resultString = "Echec, vous etes pris au piege !";
         gameState = GameState.STOPPED;
     }
 }

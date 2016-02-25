@@ -35,8 +35,10 @@ public class TrapAttacker extends ApplicationAdapter{
 
     //Text to give the user a feedback
     private BitmapFont font;
+    private BitmapFont countdownFont;
 
     private double timer;
+    private float countdown;
 
     private int iTrapIndex;
 
@@ -53,12 +55,11 @@ public class TrapAttacker extends ApplicationAdapter{
     private int posY;
 
     private boolean isTrapSet = false;
-    private boolean won = false;
-    private boolean lost = false;
 
     int iLoops;
     boolean hasClicked;
     private String resultString;
+    private String countdownText;
     private float fillAmount;
 
     //Variables used fo touch handling
@@ -88,7 +89,9 @@ public class TrapAttacker extends ApplicationAdapter{
         touchPos = new Vector3();
 
         resultString = "";
+        countdownText = "";
         fillAmount = 1;
+        countdown = 5;
 
         //Creating text using free type font generator. This allows to create
         //bitmap font without any quality loss.
@@ -97,6 +100,7 @@ public class TrapAttacker extends ApplicationAdapter{
         fontParameter.size = 30 * (Gdx.graphics.getWidth() / 800);
         fontParameter.color = Color.WHITE;
         font = fontGenerator.generateFont(fontParameter);
+        countdownFont = fontGenerator.generateFont(fontParameter);
         fontGenerator.dispose();
 
         spriteSize = new Double(Gdx.graphics.getWidth() * 0.5).intValue();
@@ -109,14 +113,48 @@ public class TrapAttacker extends ApplicationAdapter{
 
         iTrapIndex = 5;
 
-        gameState = GameState.INGAME;
+        gameState = GameState.COUNTDOWN;
     }
 
     @Override
     public void render()
     {
-        if(gameState == GameState.INGAME)
+        if(gameState == GameState.COUNTDOWN)
         {
+            countdown -= Gdx.app.getGraphics().getDeltaTime();
+
+            if(countdown > 1){
+                countdownText = new Integer(new Double(Math.floor(countdown)).intValue()).toString();
+            }
+            else if(countdown <= 1 && countdown > 0){
+                countdownText = "";
+                resultString = "Arme le piege !";
+            }
+            else{
+                resultString = "";
+                gameState = GameState.INGAME;
+            }
+        }
+
+        Gdx.gl.glClearColor(1, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        batch.begin();
+        batch.draw(backgroundSprite, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(fillBarSprite, new Double(Gdx.graphics.getWidth() * 0.305).intValue(),
+                new Double(Gdx.graphics.getHeight() * 0.91).intValue(),
+                new Double((Gdx.graphics.getWidth() * 0.39) * fillAmount).intValue(),
+                new Double(Gdx.graphics.getWidth() * 0.015).intValue());
+
+
+        font.draw(batch, resultString, new Double(Gdx.graphics.getWidth() * 0.36).intValue(), new Double(Gdx.graphics.getHeight() * 0.8).intValue());
+        countdownFont.draw(batch, countdownText, new Double(Gdx.graphics.getWidth() * 0.5).intValue(), new Double(Gdx.graphics.getHeight() * 0.8).intValue());
+
+        batch.draw(trapSprite, posX, posY, spriteSize, spriteSize);
+
+        batch.end();
+
+        if(gameState == GameState.INGAME) {
             timer += Gdx.app.getGraphics().getDeltaTime();
 
             if(timer >= 3f) {
@@ -128,9 +166,6 @@ public class TrapAttacker extends ApplicationAdapter{
             }
 
             fillAmount = new Double((3 - timer) / 3).floatValue();
-
-            Gdx.gl.glClearColor(1, 0, 0, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
             //Listen for a click on the trap sprite
             if (Gdx.input.isTouched()) {
@@ -150,6 +185,8 @@ public class TrapAttacker extends ApplicationAdapter{
                 }
             }
 
+            System.out.println(iTrapIndex);
+
             if(iTrapIndex == 0){
                 if(!isTrapSet){
                     isTrapSet = true;
@@ -159,27 +196,11 @@ public class TrapAttacker extends ApplicationAdapter{
             }
             trapSprite = new Sprite(trapImage);
 
-            batch.begin();
-            batch.draw(backgroundSprite, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            batch.draw(fillBarSprite, new Double(Gdx.graphics.getWidth() * 0.31).intValue(),
-                    new Double(Gdx.graphics.getHeight() * 0.91).intValue(),
-                    new Double((Gdx.graphics.getWidth() * 0.4) * fillAmount).intValue(),
-                    new Double(Gdx.graphics.getWidth() * 0.015).intValue());
-            batch.draw(trapSprite, posX, posY, spriteSize, spriteSize);
-            if(won){
-                resultString = "Vous avez gagné !";
-            }
-            if(lost){
-                resultString = "Vous avez perdu !";
-            }
-            font.draw(batch, resultString, new Double(Gdx.graphics.getWidth() * 0.38).intValue(), new Double(Gdx.graphics.getHeight() * 0.8).intValue());
-            batch.end();
-
             if(hasClicked){
                 iLoops++;
             }
 
-            if(iLoops >= 4){
+            if(iLoops >= 10){
                 hasClicked = false;
                 iLoops = 0;
             }
@@ -187,12 +208,12 @@ public class TrapAttacker extends ApplicationAdapter{
     }
 
     public void NotifyWin(){
+        resultString = "Le piege est prêt !";
         gameState = GameState.STOPPED;
-        won = true;
     }
 
     public void NotifyLoose(){
+        resultString = "le piege n'est pas armé !";
         gameState = GameState.STOPPED;
-        lost = true;
     }
 }

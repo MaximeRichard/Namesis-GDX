@@ -13,7 +13,8 @@ enum SwordColor{
     BLUE,
     GREEN,
     YELLOW,
-    PURPLE
+    PURPLE,
+    NONE
 }
 
 public class ColoredSword extends Sprite {

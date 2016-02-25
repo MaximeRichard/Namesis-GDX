@@ -51,13 +51,13 @@ public class CounterAttack extends ApplicationAdapter {
     private double vulnerabiltyTimer;
     private double vulnerabiltyDuration;
     private double elapsedTime;
-
-    private boolean won = false;
-    private boolean lost = false;
+    private float countdown;
 
     //Text to give the user a feedback
     private BitmapFont font;
-    String resultString;
+    private BitmapFont countdownFont;
+    private String resultString;
+    private String countdownText;
 
     //Aspect variables
     private int enemySpriteSize;
@@ -92,6 +92,7 @@ public class CounterAttack extends ApplicationAdapter {
         fontParameter.size = 30 * (Gdx.graphics.getWidth() / 800);
         fontParameter.color = Color.WHITE;
         font = fontGenerator.generateFont(fontParameter);
+        countdownFont = fontGenerator.generateFont(fontParameter);
         fontGenerator.dispose();
 
         vulnerabiltyTimer = 2 + (Math.random() * (2));
@@ -101,7 +102,9 @@ public class CounterAttack extends ApplicationAdapter {
         enemyImage = new Texture("data/monster_shield_on.png");
 
         elapsedTime = 0;
+        countdown = 5;
         resultString = "";
+        countdownText = "";
 
         //Dynamically assign the height, width, x pos and y pos of the enemy based on the screen size
         enemySpriteSize = new Double(Gdx.graphics.getWidth() * 0.4).intValue();
@@ -123,12 +126,27 @@ public class CounterAttack extends ApplicationAdapter {
     @Override
     public void render () {
 
-        if(gameState == GameState.INGAME) {
-            Gdx.gl.glClearColor(1, 0, 0, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        if(gameState == GameState.COUNTDOWN)
+        {
+            countdown -= Gdx.app.getGraphics().getDeltaTime();
 
-            if(act.SendBeaconInfo() == "PROXIMITY_IMMEDIATE" || act.SendBeaconInfo() == "PROXIMITY_NEAR")
-                vulnerabiltyDuration = vulnerabiltyTimer + 1.5f;
+            if(countdown > 1){
+                countdownText = new Integer(new Double(Math.floor(countdown)).intValue()).toString();
+            }
+            else if(countdown <= 1 && countdown > 0){
+                countdownText = "";
+                resultString = "Guette une faille dans sa défense !";
+            }
+            else{
+                countdownText = "";
+                gameState = GameState.INGAME;
+            }
+        }
+
+        if(gameState == GameState.INGAME) {
+
+            //if(act.SendBeaconInfo() == "PROXIMITY_IMMEDIATE" || act.SendBeaconInfo() == "PROXIMITY_NEAR")
+            //    vulnerabiltyDuration = vulnerabiltyTimer + 1.5f;
             //Listen for a click on the enemy sprite
             if (Gdx.input.isTouched()) {
                 touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -136,13 +154,13 @@ public class CounterAttack extends ApplicationAdapter {
                 if (touchPos.x > enemySprite.getX() && touchPos.x < enemySprite.getX() + enemySprite.getWidth()) {
                     if (touchPos.y > enemySprite.getY() && touchPos.y < enemySprite.getY() + enemySprite.getHeight()) {
                         if (enemyState == EnemyState.VULNERABLE) {
-                            if(!counterHitPlayed){
+                            if (!counterHitPlayed) {
                                 counterhit.play(0.5f);
                                 counterHitPlayed = true;
                             }
                             NotifyWin();
                         } else {
-                            if(!shieldHitPlayed){
+                            if (!shieldHitPlayed) {
                                 shieldHit.play(0.5f);
                                 shieldHitPlayed = true;
                             }
@@ -156,7 +174,7 @@ public class CounterAttack extends ApplicationAdapter {
 
             if (elapsedTime >= vulnerabiltyTimer && elapsedTime < vulnerabiltyDuration) {
                 enemyState = EnemyState.VULNERABLE;
-                if(!shieldOpeningPlayed){
+                if (!shieldOpeningPlayed) {
                     shieldOpening.play(0.5f);
                     shieldOpeningPlayed = true;
                 }
@@ -165,45 +183,41 @@ public class CounterAttack extends ApplicationAdapter {
             }
 
             //Check if the player failed to counter-attack in time
-            if(elapsedTime > vulnerabiltyTimer + vulnerabiltyDuration){
+            if (elapsedTime > vulnerabiltyTimer + vulnerabiltyDuration) {
                 //Stop the game in this case
                 NotifyLoose();
             }
-
-            //Set the right sprite
-            if (enemyState == EnemyState.DEFENDING) {
-                enemyImage = new Texture("data/monster_shield_on.png");
-            } else {
-                enemyImage = new Texture("data/monster_shield_off.png");
-            }
-
-            enemySprite = new Sprite(enemyImage);
-
-            //Render background and enemy sprite
-            batch.begin();
-            batch.draw(backgroundSprite, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-            batch.draw(enemySprite, enemyPosX, enemyPosY, enemySpriteSize, enemySpriteSize);
-
-            if(won){
-                resultString = "L'ennemi est vaincu !";
-            }
-            if(lost){
-                resultString = "Vous avez échoué !";
-            }
-            font.draw(batch, resultString, new Double(Gdx.graphics.getWidth() * 0.36).intValue(),
-                    new Double(Gdx.graphics.getHeight() * 0.92).intValue());
-            batch.end();
         }
+
+        //Set the right sprite
+        if (enemyState == EnemyState.DEFENDING) {
+            enemyImage = new Texture("data/monster_shield_on.png");
+        } else {
+            enemyImage = new Texture("data/monster_shield_off.png");
+        }
+
+        enemySprite = new Sprite(enemyImage);
+
+        //Render background and enemy sprite
+        batch.begin();
+        batch.draw(backgroundSprite, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        batch.draw(enemySprite, enemyPosX, enemyPosY, enemySpriteSize, enemySpriteSize);
+
+        font.draw(batch, resultString, new Double(Gdx.graphics.getWidth() * 0.275).intValue(),
+                new Double(Gdx.graphics.getHeight() * 0.94).intValue());
+        font.draw(batch, countdownText, new Double(Gdx.graphics.getWidth() * 0.5).intValue(),
+                new Double(Gdx.graphics.getHeight() * 0.94).intValue());
+        batch.end();
     }
 
     private void NotifyWin(){
+        resultString = "Vous avez vaincu votre adversaire !";
         gameState = GameState.STOPPED;
-        won = true;
     }
 
     private void NotifyLoose(){
+        resultString = "La contre-attaque a échoué !";
         gameState = GameState.STOPPED;
-        lost = true;
     }
 }
