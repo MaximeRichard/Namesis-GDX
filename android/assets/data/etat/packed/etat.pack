@@ -1,0 +1,26 @@
+
+etat1.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+predateur
+  rotate: false
+  xy: 2, 2
+  size: 224, 291
+  orig: 224, 291
+  offset: 0, 0
+  index: -1
+fantome
+  rotate: false
+  xy: 2, 295
+  size: 224, 291
+  orig: 224, 291
+  offset: 0, 0
+  index: -1
+defensif
+  rotate: false
+  xy: 2, 588
+  size: 224, 291
+  orig: 224, 291
+  offset: 0, 0
+  index: -1

@@ -16,30 +16,23 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 /**
- * Created by Maxime on 24/02/2016.
+ * Created by Maxime on 25/02/2016.
  */
-public class MainMenuScreen implements Screen {
+public class ModeScreen implements Screen {
     final NamesisGame game;
-
-    private Sprite background;
-
-    private TextureAtlas applicationAtlas;
-    private Skin applicationSkin;
-    private Stage stage;
-    ImageButton startButton;
-
     OrthographicCamera camera;
-
-    public MainMenuScreen(final NamesisGame namesisGame) {
+    Stage stage;
+    private Sprite background;
+    public ModeScreen(NamesisGame namesisGame) {
         game = namesisGame;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
-        background = new Sprite(new Texture("data/main_menu.png"));
-        initStartButton();
-        //buttonCredits = new Sprite(new Texture("data/main_menu.png"));
-        //buttonExit = new Sprite(new Texture("data/main_menu.png"));
+        background = new Sprite(new Texture("data/mode-background.png"));
+        initImageButton("fantome", Gdx.graphics.getWidth() * 0.10f, Gdx.graphics.getHeight() * 0.18f);
+        initImageButton("predateur", Gdx.graphics.getWidth() * 0.35f, Gdx.graphics.getHeight() * 0.18f);
+        initImageButton("defensif", Gdx.graphics.getWidth() * 0.60f, Gdx.graphics.getHeight() * 0.18f);
     }
 
     @Override
@@ -88,28 +81,40 @@ public class MainMenuScreen implements Screen {
 
     }
 
-    public void initStartButton(){
-        applicationAtlas = new TextureAtlas("data/menubuttons/menubutton.pack");
-        applicationSkin = new Skin();
+    public void initImageButton(String title, float positionX, float positionY){
+        final String eventbutton = title;
+        TextureAtlas applicationAtlas = new TextureAtlas("data/etat/packed/etat.pack");
+        Skin applicationSkin = new Skin();
         applicationSkin.addRegions(applicationAtlas);
-        ImageButton.ImageButtonStyle startButtonStyle = new ImageButton.ImageButtonStyle();
-        Drawable drawButton = applicationSkin.getDrawable("start");
+        ImageButton.ImageButtonStyle mapButtonStyle = new ImageButton.ImageButtonStyle();
+        Drawable drawButton = applicationSkin.getDrawable(title);
         drawButton.setMinHeight((drawButton.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
         drawButton.setMinWidth((drawButton.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
-        startButtonStyle.imageUp = drawButton;
-        startButton = new ImageButton(startButtonStyle);
-        startButton.setOrigin(startButton.getWidth() / 2, startButton.getHeight() / 2);
-        startButton.setPosition(Gdx.graphics.getWidth()*0.36f, Gdx.graphics.getHeight()/2);
-
-        this.startButton.addListener(new InputListener() {
+        mapButtonStyle.imageUp = drawButton;
+        ImageButton mapButton = new ImageButton(mapButtonStyle);
+        mapButton.setPosition(positionX, positionY);
+        mapButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 Gdx.app.log("My Tag", "Touche");
-                game.setScreen(new ExplorationScreen(game, PlayerMode.predateur));
+                ButtonEvent(eventbutton);
                 dispose();
                 return true;
             }
         });
+        stage.addActor(mapButton);
+    }
 
-        stage.addActor(startButton);
+    public void ButtonEvent(String action){
+        switch (action){
+            case "fantome":
+                game.setScreen(new ExplorationScreen(game, PlayerMode.fantome));
+                break;
+            case "predateur":
+                game.setScreen(new ExplorationScreen(game, PlayerMode.predateur));
+                break;
+            default:
+                game.setScreen(new ExplorationScreen(game, PlayerMode.defenseur));
+                break;
+        }
     }
 }
