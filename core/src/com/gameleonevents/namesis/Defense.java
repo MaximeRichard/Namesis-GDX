@@ -291,11 +291,12 @@ public class Defense implements Screen {
         float delay = 1; // seconds
 
         int enemyScore = IA.SimulerAttaque();
-        if(enemyScore > defenceValidated)
+        if(enemyScore > defenceValidated){
             screen = "data/screens/defense-echoue.png";
+            game.setScore(game.getScore() + 1);
+        }
         else
             screen = "data/screens/defense-reussi.png";
-
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {

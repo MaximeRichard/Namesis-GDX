@@ -9,12 +9,15 @@ public class NamesisGame extends Game {
     public BitmapFont font;
     public ActionResolver act;
 
+    private int _score;
+
     public NamesisGame(ActionResolver actionResolver) {
         this.act = actionResolver;
     }
 
     public void create() {
         batch = new SpriteBatch();
+        _score = 0;
         //Use LibGDX's default Arial font.
         font = new BitmapFont();
         this.setScreen(new MainMenuScreen(this));
@@ -27,5 +30,13 @@ public class NamesisGame extends Game {
     public void dispose() {
         batch.dispose();
         font.dispose();
+    }
+
+    public int getScore(){
+        return _score;
+    }
+
+    public void setScore(int score){
+        _score = score;
     }
 }
