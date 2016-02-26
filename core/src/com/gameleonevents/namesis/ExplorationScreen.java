@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.sensoro.beacon.kit.Beacon;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -106,7 +107,7 @@ public class ExplorationScreen implements Screen {
         stage.draw();
         game.batch.end();
 
-        game.batch.begin();
+        /*game.batch.begin();
         if (game.act.SendBeaconId() != null){
             if(game.act.SendBeaconId().containsKey("0117C55B5938")) {
                 hopital = true;
@@ -125,52 +126,46 @@ public class ExplorationScreen implements Screen {
                 armory = true;
             else
                 armory = false;
-
-
-            if (hopital) {
-                draw1 = applicationSkin.getDrawable("hopital");
-                draw1.setMinHeight((draw1.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
-                draw1.setMinWidth((draw1.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
-                ims1.imageUp = this.draw1;
-                butt1.setStyle(ims1);
-            }
-            else {
-                draw1 = applicationSkin.getDrawable("hopital-gray");
-                draw1.setMinHeight((draw1.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
-                draw1.setMinWidth((draw1.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
-                ims1.imageUp = this.draw1;
-                butt1.setStyle(ims1);
-            }
-            if (boost) {
-                draw2 = applicationSkin.getDrawable("boost");
-                draw2.setMinHeight((draw2.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
-                draw2.setMinWidth((draw2.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
-                ims2.imageUp = this.draw2;
-                butt2.setStyle(ims2);
-            }
-            else{
-                draw2 = applicationSkin.getDrawable("boost-gray");
-                draw2.setMinHeight((draw2.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
-                draw2.setMinWidth((draw2.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
-                ims2.imageUp = this.draw2;
-                butt2.setStyle(ims2);
-            }
-            if (armory) {
-                draw3 = applicationSkin.getDrawable("armory");
-                draw3.setMinHeight((draw3.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
-                draw3.setMinWidth((draw3.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
-                ims3.imageUp = this.draw3;
-                butt3.setStyle(ims3);
-            }
-            else {
-                draw3 = applicationSkin.getDrawable("armory-gray");
-                draw3.setMinHeight((draw3.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
-                draw3.setMinWidth((draw3.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
-                ims3.imageUp = this.draw3;
-                butt3.setStyle(ims3);
-            }
         }
-        game.batch.end();
+        game.batch.end();*/
+
+        for(Map.Entry<String, String> entry : this.game.act.SendBeaconId().entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if(key.equals("0117C55B5938") && value.equals("PROXIMITY_IMMEDIATE")) {
+                if (Math.random() >= 0.5) {
+                    game.setScreen(new Attack(game));
+                } else {
+                    game.setScreen(new Defense(game));
+                }
+            }
+            if(key.equals("0117C55CDCC2") && value.equals("PROXIMITY_IMMEDIATE")) {
+                if(Math.random()>=0.5) {
+                    game.setScreen(new CounterAttack(game));
+                }
+                else{
+                    game.setScreen(new TrapDefender(game));
+                }
+            }
+            if(key.equals("0117C552789F") && value.equals("PROXIMITY_IMMEDIATE")) {
+                if(Math.random()>=0.5) {
+                    game.setScreen(new CounterAttack(game));
+                }
+                else{
+                    game.setScreen(new TrapDefender(game));
+                }
+            }
+            if(key.equals("0117C55E2F15") && value.equals("PROXIMITY_IMMEDIATE")) {
+                if (Math.random() >= 0.5) {
+                    game.setScreen(new Attack(game));
+                } else {
+                    game.setScreen(new Defense(game));
+                }
+            }
+
+            // do what you have to do here
+            // In your case, an other loop.
+        }
     }
 
     @Override
