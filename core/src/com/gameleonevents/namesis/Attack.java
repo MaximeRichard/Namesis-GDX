@@ -35,6 +35,8 @@ public class Attack implements Screen {
     private final float lockingTime = 0.5f;
     private final float swordMoveSpeed = 0.5f;
 
+    private String screen = "";
+
     //Text to give the user a feedback
     private BitmapFont scoreFont;
     private BitmapFont gameFont;
@@ -320,10 +322,18 @@ public class Attack implements Screen {
         gameTextString = "Score final : " + bricksValidated + " points";
         float delay = 1; // seconds
 
+        int enemyScore = IA.SimulerDefense();
+        if(enemyScore <= bricksValidated){
+            screen = "data/screens/attaque-reussi.png";
+            game.setScore(game.getScore() + 1);
+        }
+        else
+            screen = "data/screens/attaque-echoue.png";
+
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
-                game.setScreen(new ExplorationScreen(game, PlayerMode.predateur));
+                game.setScreen(new EcranIntermediaire(game, PlayerMode.predateur, screen));
             }
         }, delay);
 
