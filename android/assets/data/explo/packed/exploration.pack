@@ -73,7 +73,7 @@ perso-dragon
   orig: 128, 128
   offset: 0, 0
   index: -1
-boost
+boost-gray
   rotate: false
   xy: 404, 397
   size: 77, 80

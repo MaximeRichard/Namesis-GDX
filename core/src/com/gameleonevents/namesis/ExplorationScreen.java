@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -21,6 +22,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.sensoro.beacon.kit.Beacon;
+
+import java.util.Map;
 
 /**
  * Created by Maxime on 24/02/2016.
@@ -48,7 +52,19 @@ public class ExplorationScreen implements Screen {
     FreeTypeFontGenerator.FreeTypeFontParameter fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
     private Sprite background;
 
+    ImageButton.ImageButtonStyle ims1,ims2,ims3;
+    Drawable draw1,draw2,draw3;
+    ImageButton butt1,butt2,butt3;
+
+    TextureAtlas applicationAtlas;
+    Skin applicationSkin;
+    boolean hopital = false, armory = false, boost = false;
+
     public ExplorationScreen(NamesisGame namesisGame, PlayerMode state) {
+        applicationAtlas = new TextureAtlas("data/explo/packed/exploration.pack");
+        applicationSkin = new Skin();
+        applicationSkin.addRegions(applicationAtlas);
+
         game = namesisGame;
         this.state = state;
         stringState = "mode-"+ state.toString();
@@ -62,9 +78,7 @@ public class ExplorationScreen implements Screen {
         initImageButton("carte", 0, 0);
         initImageButton("perso-psycho", 0, Gdx.graphics.getHeight() * 0.78f);
         initTextButton(stringState, Gdx.graphics.getWidth() * 0.80f, 0, "Choix\ndu\nmode");
-        initImageButton("hopital", Gdx.graphics.getWidth() * 0.33f, Gdx.graphics.getHeight() * 0.85f);
-        initImageButton("armory", Gdx.graphics.getWidth() * 0.465f, Gdx.graphics.getHeight() * 0.85f);
-        initImageButton("boost", Gdx.graphics.getWidth() * 0.60f, Gdx.graphics.getHeight() * 0.85f);
+        initBeaconButtons();
         initImageButton("predateur",   (Gdx.graphics.getWidth() * 0.33f) + (float) (Math.random() *  ((Gdx.graphics.getWidth() * 0.60f)-(Gdx.graphics.getWidth() * 0.33f))), Gdx.graphics.getHeight() * 0.50f);
         initImageButton("defenseur",  (Gdx.graphics.getWidth() * 0.33f) + (float) (Math.random() *  ((Gdx.graphics.getWidth() * 0.60f)-(Gdx.graphics.getWidth() * 0.33f))), Gdx.graphics.getHeight() * 0.28f);
         initImageButton("predateur",   (Gdx.graphics.getWidth() * 0.33f) + (float) (Math.random() *  ((Gdx.graphics.getWidth() * 0.60f)-(Gdx.graphics.getWidth() * 0.33f))), Gdx.graphics.getHeight() * 0.07f);
@@ -86,9 +100,92 @@ public class ExplorationScreen implements Screen {
 
         game.batch.begin();
         game.batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
         game.batch.end();
         game.batch.begin();
         stage.draw();
+        game.batch.end();
+
+        game.batch.begin();
+        if (game.act.SendBeaconId() != null){
+            /*for (Map.Entry<String, String> beacon : game.act.SendBeaconId().entrySet())
+            {
+
+                if(beacon.getKey().equals("0117C55B5938") && (beacon.getValue().equals("PROXIMITY_NEAR") || beacon.getValue().equals("PROXIMITY_IMMEDIATE"))){
+                    hopital = true;
+                }
+                if(beacon.getKey().equals("0117C55CDCC2") && (beacon.getValue().equals("PROXIMITY_NEAR") || beacon.getValue().equals("PROXIMITY_IMMEDIATE"))){
+                    boost = true;
+                }
+                if(beacon.getKey().equals("0117C552789F") && (beacon.getValue().equals("PROXIMITY_NEAR") || beacon.getValue().equals("PROXIMITY_IMMEDIATE"))){
+                    boost = true;
+                }
+                if(beacon.getKey().equals("0117C55E2F15") && (beacon.getValue().equals("PROXIMITY_NEAR") || beacon.getValue().equals("PROXIMITY_IMMEDIATE"))){
+                    armory = true;
+                }*/
+            if(game.act.SendBeaconId().containsKey("0117C55B5938")) {
+                hopital = true;
+            }
+            else
+                hopital = false;
+            if(game.act.SendBeaconId().containsKey("0117C55CDCC2"))
+                boost = true;
+            else
+                boost = false;
+            if(game.act.SendBeaconId().containsKey("0117C552789F"))
+                boost = true;
+            else
+                boost = false;
+            if(game.act.SendBeaconId().containsKey("0117C55E2F15"))
+                armory = true;
+            else
+                armory = false;
+
+
+            if (hopital) {
+                Gdx.app.log("My Tag", "Test");
+                draw1 = applicationSkin.getDrawable("hopital");
+                draw1.setMinHeight((draw1.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+                draw1.setMinWidth((draw1.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+                ims1.imageUp = this.draw1;
+                butt1.setStyle(ims1);
+            }
+            else {
+                draw1 = applicationSkin.getDrawable("hopital-gray");
+                draw1.setMinHeight((draw1.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+                draw1.setMinWidth((draw1.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+                ims1.imageUp = this.draw1;
+                butt1.setStyle(ims1);
+            }
+            if (boost) {
+                draw2 = applicationSkin.getDrawable("boost");
+                draw2.setMinHeight((draw2.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+                draw2.setMinWidth((draw2.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+                ims2.imageUp = this.draw2;
+                butt2.setStyle(ims2);
+            }
+            else{
+                draw2 = applicationSkin.getDrawable("boost-gray");
+                draw2.setMinHeight((draw2.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+                draw2.setMinWidth((draw2.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+                ims2.imageUp = this.draw2;
+                butt2.setStyle(ims2);
+            }
+            if (armory) {
+                draw3 = applicationSkin.getDrawable("armory");
+                draw3.setMinHeight((draw3.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+                draw3.setMinWidth((draw3.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+                ims3.imageUp = this.draw3;
+                butt3.setStyle(ims3);
+            }
+            else {
+                draw3 = applicationSkin.getDrawable("armory-gray");
+                draw3.setMinHeight((draw3.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+                draw3.setMinWidth((draw3.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+                ims3.imageUp = this.draw3;
+                butt3.setStyle(ims3);
+            }
+        }
         game.batch.end();
     }
 
@@ -119,9 +216,6 @@ public class ExplorationScreen implements Screen {
 
     public void initImageButton(String title, float positionX, float positionY){
         final String eventbutton = title;
-        TextureAtlas applicationAtlas = new TextureAtlas("data/explo/packed/exploration.pack");
-        Skin applicationSkin = new Skin();
-        applicationSkin.addRegions(applicationAtlas);
         ImageButton.ImageButtonStyle mapButtonStyle = new ImageButton.ImageButtonStyle();
         Drawable drawButton = applicationSkin.getDrawable(title);
         drawButton.setMinHeight((drawButton.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
@@ -137,14 +231,65 @@ public class ExplorationScreen implements Screen {
                 return true;
             }
         });
+        mapButton.setName(title);
         stage.addActor(mapButton);
+    }
+
+    public void initBeaconButtons(){
+        ims1 = new ImageButton.ImageButtonStyle();
+        draw1 = applicationSkin.getDrawable("hopital-gray");
+        draw1.setMinHeight((draw1.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+        draw1.setMinWidth((draw1.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+        ims1.imageUp = draw1;
+        butt1 = new ImageButton(ims1);
+        butt1.setPosition(Gdx.graphics.getWidth() * 0.33f, Gdx.graphics.getHeight() * 0.85f);
+        butt1.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Gdx.app.log("My Tag", "Touche");
+                //ButtonEvent(eventbutton);
+                dispose();
+                return true;
+            }
+        });
+        stage.addActor(butt1);
+
+        ims2 = new ImageButton.ImageButtonStyle();
+        draw2 = applicationSkin.getDrawable("armory-gray");
+        draw2.setMinHeight((draw2.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+        draw2.setMinWidth((draw2.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+        ims2.imageUp = draw2;
+        butt2 = new ImageButton(ims2);
+        butt2.setPosition(Gdx.graphics.getWidth() * 0.465f, Gdx.graphics.getHeight() * 0.85f);
+        butt2.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Gdx.app.log("My Tag", "Touche");
+                //ButtonEvent(eventbutton);
+                dispose();
+                return true;
+            }
+        });
+        stage.addActor(butt2);
+
+        ims3 = new ImageButton.ImageButtonStyle();
+        draw3 = applicationSkin.getDrawable("boost-gray");
+        draw3.setMinHeight((draw3.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+        draw3.setMinWidth((draw3.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
+        ims3.imageUp = draw3;
+        butt3 = new ImageButton(ims3);
+        butt3.setPosition(Gdx.graphics.getWidth() * 0.60f, Gdx.graphics.getHeight() * 0.85f);
+        butt3.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Gdx.app.log("My Tag", "Touche");
+                //ButtonEvent(eventbutton);
+                dispose();
+                return true;
+            }
+        });
+        stage.addActor(butt3);
     }
 
     public void initTextButton(String titleButton, float positionX, float positionY, String text){
         final String eventbutton = titleButton;
-        TextureAtlas applicationAtlas = new TextureAtlas("data/explo/packed/exploration.pack");
-        Skin applicationSkin = new Skin();
-        applicationSkin.addRegions(applicationAtlas);
         TextButton.TextButtonStyle mapButtonStyle = new TextButton.TextButtonStyle();
         Drawable drawButton = applicationSkin.getDrawable(titleButton);
         drawButton.setMinHeight((drawButton.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
@@ -154,7 +299,7 @@ public class ExplorationScreen implements Screen {
         TextButton mapButton = new TextButton(text, mapButtonStyle);
         mapButton.setPosition(positionX, positionY);
         mapButton.getLabel().setWrap(true);
-        mapButton.getLabel().setWidth(mapButton.getWidth()*0.1f);
+        mapButton.getLabel().setWidth(mapButton.getWidth() * 0.1f);
         mapButton.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 ButtonEvent(eventbutton);
@@ -162,6 +307,7 @@ public class ExplorationScreen implements Screen {
                 return true;
             }
         });
+        mapButton.setName(titleButton);
         stage.addActor(mapButton);
     }
 
@@ -177,13 +323,17 @@ public class ExplorationScreen implements Screen {
                 game.setScreen(new ModeScreen(game));
                 break;
             case "predateur":
-                Skin uiSkin = new Skin(Gdx.files.internal("data/uiskin.json"));
-                Label label = new Label("Tap tiles to build a word and then press the blue button to play the word", uiSkin);
+                if(state == PlayerMode.predateur){
+                    //game.setScreen(new Attack(game));
+                }
+                game.setScreen(new ModeScreen(game));
+                /*Skin uiSkin = new Skin(Gdx.files.internal("data/uiskin.json"));
+                Label label = new Label("Voulez-vous vraiment attaquer ce joueur?", uiSkin);
                 label.setWrap(true);
-                label.setFontScale(.8f);
+                label.setFontScale(1f);
                 label.setAlignment(Align.center);
 
-                Dialog dialog =
+                final Dialog dialog =
                         new Dialog("", uiSkin, "dialog") {
                             protected void result (Object object) {
                                 System.out.println("Chosen: " + object);
@@ -195,15 +345,36 @@ public class ExplorationScreen implements Screen {
                 dialog.getButtonTable().padTop(50);
 
                 TextButton dbutton = new TextButton("Yes", uiSkin, "dialog");
+                dbutton.getLabelCell().setActorWidth(dbutton.getMinWidth() * Gdx.graphics.getWidth() * 0.001f);
+                dbutton.getLabelCell().setActorHeight((dbutton.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
+                dbutton.addListener(new InputListener() {
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        Gdx.app.log("My Tag", "Touche");
+                        ButtonEvent("attackPredator");
+                        dialog.hide();
+                        dispose();
+                        return true;
+                    }
+                });
                 dialog.button(dbutton, true);
 
                 dbutton = new TextButton("No", uiSkin, "dialog");
+                dbutton.addListener(new InputListener() {
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        Gdx.app.log("My Tag", "Touche");
+                        ButtonEvent("attackDefender");
+                        dialog.hide();
+                        dispose();
+                        return true;
+                    }
+                });
                 dialog.button(dbutton, false);
                 dialog.key(Input.Keys.ENTER, true).key(Input.Keys.ESCAPE, false);
                 dialog.invalidateHierarchy();
                 dialog.invalidate();
                 dialog.layout();
                 dialog.show(stage);
+                break;*/
             default:
                 break;
         }

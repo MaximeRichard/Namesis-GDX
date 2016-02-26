@@ -8,6 +8,7 @@ import com.sensoro.beacon.kit.BeaconManagerListener;
 import com.sensoro.cloud.SensoroManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Maxime on 11/02/2016.
@@ -15,28 +16,16 @@ import java.util.ArrayList;
 public class ActionResolverAndroid implements ActionResolver {
 
 
+    public static ArrayList<Beacon> getBeaconList() {
+        return beaconList;
+    }
+
+    public static void setBeaconList(ArrayList<Beacon> beaconList) {
+        ActionResolverAndroid.beaconList = beaconList;
+    }
 
     //paramètre de classe statique pour faire passer les infos du beacon detecté
-    public static String beaconInfo;
-
-    public static String getBeaconDistance() {
-        return beaconDistance;
-    }
-
-    public static void setBeaconDistance(String beaconDistance) {
-        ActionResolverAndroid.beaconDistance = beaconDistance;
-    }
-
-    public static String beaconDistance;
-
-    public static String getBeaconInfo() {
-        return beaconInfo;
-    }
-
-    public static void setBeaconInfo(String beaconInfo) {
-        ActionResolverAndroid.beaconInfo = beaconInfo;
-    }
-
+    public static ArrayList<Beacon> beaconList;
     BluetoothAdapter bluetoothAdapter;
     SensoroManager sensoroManager;
     Context context;
@@ -83,10 +72,11 @@ public class ActionResolverAndroid implements ActionResolver {
 
             @Override
             public void onUpdateBeacon(ArrayList<Beacon> beacons) {
-                for(Beacon beacon:beacons){
+                setBeaconList(beacons);
+                /*for(Beacon beacon:beacons){
                     setBeaconDistance(beacon.getAccuracy()+"");
                     setBeaconInfo(beacon.getProximity().toString());
-                }
+                }*/
             }
 
             @Override
@@ -104,15 +94,33 @@ public class ActionResolverAndroid implements ActionResolver {
 
 
     @Override
-    public String SendBeaconInfo(){
-        if(getBeaconInfo() == null) return "No Beacon";
-        else return getBeaconInfo();
+    public HashMap<String, String> SendBeaconId(){
+        if(getBeaconList() == null) return null;
+        HashMap<String, String> beaconIds = new HashMap<String, String>();
+        for (Beacon beacon:getBeaconList()){
+            beaconIds.put(beacon.getSerialNumber(), beacon.getProximity().toString());
+        }
+        return beaconIds;
+    }
+
+    /*@Override
+    public ArrayList<Double> SendBeaconDistance() {
+        if(getBeaconList() == null) return null;
+        ArrayList<Double> beaconIds = new ArrayList<Double>();
+        for (Beacon beacon:getBeaconList()){
+            beaconIds.add(beacon.getAccuracy());
+        }
+        return beaconIds;
     }
 
     @Override
-    public String SendBeaconDistance(){
-        if(getBeaconDistance() == null) return "No ID";
-        else return getBeaconDistance();
-    }
+    public ArrayList<String> SendBeaconProximity() {
+        if(getBeaconList() == null) return null;
+        ArrayList<String> beaconIds = new ArrayList<String>();
+        for (Beacon beacon:getBeaconList()){
+            beaconIds.add(beacon.getProximity().toString());
+        }
+        return beaconIds;
+    }*/
 
     }

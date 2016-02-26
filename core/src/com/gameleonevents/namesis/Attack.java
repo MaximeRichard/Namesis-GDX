@@ -72,13 +72,13 @@ public class Attack extends ApplicationAdapter
     private ImageButton yellowButton;
     private ImageButton greenButton;
     private ImageButton purpleButton;
-    public ActionResolver act;
+    final NamesisGame game;
 
     private double timer;
     private float fillAmount;
 
-    public Attack(ActionResolver actionResolver) {
-        this.act = actionResolver;
+    public Attack(NamesisGame namesisGame) {
+        game = namesisGame;
     }
 
     @Override

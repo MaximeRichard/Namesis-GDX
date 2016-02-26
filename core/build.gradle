@@ -7,4 +7,5 @@ eclipse.project {
 }
 dependencies {
     compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    compile files('libs/sensorobeaconkit-4.1.1.jar')
 }
