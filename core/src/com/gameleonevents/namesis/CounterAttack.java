@@ -2,6 +2,7 @@ package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -29,7 +30,7 @@ enum GameState{
     COUNTDOWN
 }
 
-public class CounterAttack extends ApplicationAdapter {
+public class CounterAttack implements Screen {
 
     //Global variable to handle the game state
     private GameState gameState;
@@ -76,14 +77,11 @@ public class CounterAttack extends ApplicationAdapter {
     private boolean shieldOpeningPlayed = false;
     private boolean counterHitPlayed = false;
 
-    public ActionResolver act;
+    public NamesisGame game;
 
-    public CounterAttack(ActionResolver actionResolver) {
-        this.act = actionResolver;
-    }
+    public CounterAttack(NamesisGame game) {
+        this.game = game;
 
-    @Override
-    public void create () {
         batch = new SpriteBatch();
         backgroundImage = new Texture("data/counter_attack_background.png");
         backgroundSprite = new Sprite(backgroundImage);
@@ -128,9 +126,43 @@ public class CounterAttack extends ApplicationAdapter {
         gameState = GameState.COUNTDOWN;
     }
 
-    @Override
-    public void render () {
 
+
+
+    private void NotifyWin(){
+        resultString = "Vous avez vaincu votre adversaire !";
+        gameState = GameState.STOPPED;
+        hasWon = true;
+        float delay = 1; // seconds
+
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                game.setScreen(new ExplorationScreen(game, PlayerMode.defenseur));
+            }
+        }, delay);
+    }
+
+    private void NotifyLoose(){
+        resultString = "La contre-attaque a échoué !";
+        gameState = GameState.STOPPED;
+        float delay = 1; // seconds
+
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                game.setScreen(new ExplorationScreen(game, PlayerMode.defenseur));
+            }
+        }, delay);
+    }
+
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void render(float delta) {
         if(gameState == GameState.COUNTDOWN)
         {
             countdown -= Gdx.app.getGraphics().getDeltaTime();
@@ -218,14 +250,28 @@ public class CounterAttack extends ApplicationAdapter {
         batch.end();
     }
 
-    private void NotifyWin(){
-        resultString = "Vous avez vaincu votre adversaire !";
-        gameState = GameState.STOPPED;
-        hasWon = true;
+    @Override
+    public void resize(int width, int height) {
+
     }
 
-    private void NotifyLoose(){
-        resultString = "La contre-attaque a échoué !";
-        gameState = GameState.STOPPED;
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

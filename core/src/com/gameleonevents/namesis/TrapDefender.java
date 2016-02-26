@@ -2,6 +2,7 @@ package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Timer;
 
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -21,7 +23,7 @@ import java.util.Map;
  * Created by Pierre on 12/02/2016.
  */
 
-public class TrapDefender extends ApplicationAdapter{
+public class TrapDefender implements Screen {
 
     private GameState gameState;
 
@@ -65,58 +67,89 @@ public class TrapDefender extends ApplicationAdapter{
     private Vector3 touchPos;
     private OrthographicCamera camera;
 
-    @Override
-    public void create(){
+    public NamesisGame game;
 
-        batch = new SpriteBatch();
+    public TrapDefender(NamesisGame game){
+        this.game = game;
+    batch = new SpriteBatch();
 
-        backgroundImage = new Texture("data/trap_background.png");
-        backgroundSprite = new Sprite(backgroundImage);
+    backgroundImage = new Texture("data/trap_background.png");
+    backgroundSprite = new Sprite(backgroundImage);
 
-        fillBarImage = new Texture("data/fill_bar.png");
-        fillBarSprite = new Sprite(fillBarImage);
+    fillBarImage = new Texture("data/fill_bar.png");
+    fillBarSprite = new Sprite(fillBarImage);
 
-        trapImage = new Texture("data/trap0.png");
-        trapSprite = new Sprite(trapImage);
+    trapImage = new Texture("data/trap0.png");
+    trapSprite = new Sprite(trapImage);
 
-        trapSetting = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/setting_trap.mp3"));
-        trapFree = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/trap_free.mp3"));
-        endTimer = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/end_timer.mp3"));
+    trapSetting = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/setting_trap.mp3"));
+    trapFree = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/trap_free.mp3"));
+    endTimer = Gdx.audio.newSound(Gdx.files.internal("data/Sounds/end_timer.mp3"));
 
-        camera = new OrthographicCamera();
-        camera.setToOrtho(true, 600, 600);
-        touchPos = new Vector3();
+    camera = new OrthographicCamera();
+    camera.setToOrtho(true, 600, 600);
+    touchPos = new Vector3();
 
-        resultString = "";
-        countdownText = "";
-        fillAmount = 1;
+    resultString = "";
+    countdownText = "";
+    fillAmount = 1;
 
-        //Creating text using free type font generator. This allows to create
-        //bitmap font without any quality loss.
-        FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("data/HAMLETORNOT.TTF"));
-        FreeTypeFontGenerator.FreeTypeFontParameter fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        fontParameter.size = 30 * (Gdx.graphics.getWidth() / 800);
-        fontParameter.color = Color.WHITE;
-        font = fontGenerator.generateFont(fontParameter);
-        fontGenerator.dispose();
+    //Creating text using free type font generator. This allows to create
+    //bitmap font without any quality loss.
+    FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("data/HAMLETORNOT.TTF"));
+    FreeTypeFontGenerator.FreeTypeFontParameter fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+    fontParameter.size = 30 * (Gdx.graphics.getWidth() / 800);
+    fontParameter.color = Color.WHITE;
+    font = fontGenerator.generateFont(fontParameter);
+    fontGenerator.dispose();
 
-        spriteSize = new Double(Gdx.graphics.getWidth() * 0.5).intValue();
-        posX = new Double((Gdx.graphics.getWidth() - spriteSize) / 2).intValue();
-        posY = new Double(Gdx.graphics.getHeight() * 0.01).intValue();
+    spriteSize = new Double(Gdx.graphics.getWidth() * 0.5).intValue();
+    posX = new Double((Gdx.graphics.getWidth() - spriteSize) / 2).intValue();
+    posY = new Double(Gdx.graphics.getHeight() * 0.01).intValue();
 
-        timer = 0;
-        iLoops = 0;
-        hasClicked = false;
-        countdown = 5;
+    timer = 0;
+    iLoops = 0;
+    hasClicked = false;
+    countdown = 5;
 
-        iTrapIndex = 0;
+    iTrapIndex = 0;
 
-        gameState = GameState.COUNTDOWN;
+    gameState = GameState.COUNTDOWN;
+}
+
+    public void NotifyWin(){
+        resultString = "Le piege est désamorcé !";
+        gameState = GameState.STOPPED;
+        float delay = 1; // seconds
+
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                game.setScreen(new ExplorationScreen(game, PlayerMode.defenseur));
+            }
+        }, delay);
+    }
+
+    public void NotifyLoose(){
+        resultString = "Echec, vous etes pris au piege !";
+        gameState = GameState.STOPPED;
+        float delay = 1; // seconds
+
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                game.setScreen(new ExplorationScreen(game, PlayerMode.defenseur));
+            }
+        }, delay);
     }
 
     @Override
-    public void render()
-    {
+    public void show() {
+
+    }
+
+    @Override
+    public void render(float delta) {
         if(gameState == GameState.COUNTDOWN)
         {
             countdown -= Gdx.app.getGraphics().getDeltaTime();
@@ -200,14 +233,28 @@ public class TrapDefender extends ApplicationAdapter{
         }
     }
 
-    public void NotifyWin(){
-        resultString = "Le piege est désamorcé !";
-        gameState = GameState.STOPPED;
+    @Override
+    public void resize(int width, int height) {
 
     }
 
-    public void NotifyLoose(){
-        resultString = "Echec, vous etes pris au piege !";
-        gameState = GameState.STOPPED;
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

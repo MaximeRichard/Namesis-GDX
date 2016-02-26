@@ -2,6 +2,7 @@ package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.LinkedList;
@@ -26,8 +28,7 @@ import java.util.LinkedList;
  * Created by Pierre on 17/02/2016.
  */
 
-public class Attack extends ApplicationAdapter
-{
+public class Attack implements Screen {
     private SpriteBatch batch;
 
     private final int limitTimer = 10;
@@ -79,11 +80,7 @@ public class Attack extends ApplicationAdapter
 
     public Attack(NamesisGame namesisGame) {
         game = namesisGame;
-    }
 
-    @Override
-    public void create()
-    {
         //Creating text using free type font generator. This allows to create
         //bitmap font without any quality loss.
         FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("data/HAMLETORNOT.TTF"));
@@ -143,103 +140,6 @@ public class Attack extends ApplicationAdapter
 
         sword.setSwordState(SwordState.LOCKED);
         gameState = GameState.COUNTDOWN;
-    }
-
-    @Override
-    public void render()
-    {
-        if(gameState == GameState.COUNTDOWN)
-        {
-            countdown -= Gdx.app.getGraphics().getDeltaTime();
-
-            if(countdown > 1){
-                countdownText = new Integer(new Double(Math.floor(countdown)).intValue()).toString();
-            }
-            else if(countdown <= 1 && countdown > 0){
-                countdownText = "";
-                gameTextString = "Détruis les gemmes !";
-            }
-            else{
-                gameTextString = "";
-                gameState = GameState.INGAME;
-            }
-        }
-
-        if(gameState == GameState.INGAME)
-        {
-            Gdx.gl.glClearColor(1, 0, 0, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-            if(sword.getSwordState() == SwordState.MOVING)
-            {
-                if(sword.getX() <= Gdx.graphics.getWidth()*0.85f && sword.getDirection() == Direction.LEFT) {
-                    sword.setX(sword.getX()+Gdx.graphics.getDeltaTime() * swordSpeed);
-                }
-                else if (sword.getX() >= Gdx.graphics.getWidth()*0.05f && sword.getDirection() == Direction.RIGHT) {
-                    sword.setX(sword.getX()-Gdx.graphics.getDeltaTime() * swordSpeed);
-                }
-
-                if(sword.getX() >= Gdx.graphics.getWidth()*0.85f && sword.getDirection() == Direction.LEFT) {
-                    sword.setDirection(Direction.RIGHT);
-                }
-                else if (sword.getX() <= Gdx.graphics.getWidth()*0.05f && sword.getDirection() == Direction.RIGHT) {
-                    sword.setDirection(Direction.LEFT);
-                }
-            }
-            else
-            {
-                timeLocked += Gdx.app.getGraphics().getDeltaTime();
-                if(timeLocked > lockingTime){
-                    sword.setSwordState(SwordState.MOVING);
-                    //CHANGE SWORD SPRITE TO MOVING
-                }
-            }
-
-            //Updating timer
-            timer += Gdx.app.getGraphics().getDeltaTime();
-            fillAmount = new Double((limitTimer - timer) / limitTimer).floatValue();
-
-            //Victory/Game end checkings
-            if(timer >= limitTimer){
-                NotifyEnd();
-            }
-
-            if(bricksValidated == 12){
-                NotifyEnd();
-            }
-        }
-
-        batch.begin();
-        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.draw(sword, sword.getX(), Gdx.graphics.getHeight()*0.43f + gemSize, Gdx.graphics.getWidth()*0.09f, Gdx.graphics.getHeight()*0.3f);
-        scoreFont.draw(batch, new Integer(bricksValidated).toString(), new Double(Gdx.graphics.getWidth() * 0.92).intValue(), new Double(Gdx.graphics.getHeight() * 0.965).intValue());
-        gameFont.draw(batch, gameTextString, new Double(Gdx.graphics.getWidth() * 0.35).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
-        gameFont.draw(batch, countdownText, new Double(Gdx.graphics.getWidth() * 0.5).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
-
-        batch.end();
-        batch.begin();
-        stage.draw();
-        batch.end();
-
-        batch.begin();
-
-        for(int i = 0; i < gems.size(); i++){
-            Gem myGem = gems.get(i);
-            if(myGem.GetDisplayed()){
-                batch.draw(myGem, myGem.getPositionX(), myGem.getPositionY(), myGem.getSize(), myGem.getSize());
-            }
-        }
-
-        batch.draw(fillBarSprite, new Double(Gdx.graphics.getWidth() * 0.31).intValue(),
-                new Double(Gdx.graphics.getHeight() * 0.925).intValue(),
-                new Double((Gdx.graphics.getWidth() * 0.4) * fillAmount).intValue(),
-                new Double(Gdx.graphics.getWidth() * 0.015).intValue());
-
-        batch.end();
-
-        batch.begin();
-        stage.draw();
-        batch.end();
     }
 
     public int CheckCollision(){
@@ -418,5 +318,140 @@ public class Attack extends ApplicationAdapter
     {
         gameState = GameState.STOPPED;
         gameTextString = "Score final : " + bricksValidated + " points";
+        float delay = 1; // seconds
+
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                game.setScreen(new ExplorationScreen(game, PlayerMode.predateur));
+            }
+        }, delay);
+
+    }
+
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void render(float delta) {
+        if(gameState == GameState.COUNTDOWN)
+        {
+            countdown -= Gdx.app.getGraphics().getDeltaTime();
+
+            if(countdown > 1){
+                countdownText = new Integer(new Double(Math.floor(countdown)).intValue()).toString();
+            }
+            else if(countdown <= 1 && countdown > 0){
+                countdownText = "";
+                gameTextString = "Détruis les gemmes !";
+            }
+            else{
+                gameTextString = "";
+                gameState = GameState.INGAME;
+            }
+        }
+
+        if(gameState == GameState.INGAME)
+        {
+            Gdx.gl.glClearColor(1, 0, 0, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+            if(sword.getSwordState() == SwordState.MOVING)
+            {
+                if(sword.getX() <= Gdx.graphics.getWidth()*0.85f && sword.getDirection() == Direction.LEFT) {
+                    sword.setX(sword.getX()+Gdx.graphics.getDeltaTime() * swordSpeed);
+                }
+                else if (sword.getX() >= Gdx.graphics.getWidth()*0.05f && sword.getDirection() == Direction.RIGHT) {
+                    sword.setX(sword.getX()-Gdx.graphics.getDeltaTime() * swordSpeed);
+                }
+
+                if(sword.getX() >= Gdx.graphics.getWidth()*0.85f && sword.getDirection() == Direction.LEFT) {
+                    sword.setDirection(Direction.RIGHT);
+                }
+                else if (sword.getX() <= Gdx.graphics.getWidth()*0.05f && sword.getDirection() == Direction.RIGHT) {
+                    sword.setDirection(Direction.LEFT);
+                }
+            }
+            else
+            {
+                timeLocked += Gdx.app.getGraphics().getDeltaTime();
+                if(timeLocked > lockingTime){
+                    sword.setSwordState(SwordState.MOVING);
+                    //CHANGE SWORD SPRITE TO MOVING
+                }
+            }
+
+            //Updating timer
+            timer += Gdx.app.getGraphics().getDeltaTime();
+            fillAmount = new Double((limitTimer - timer) / limitTimer).floatValue();
+
+            //Victory/Game end checkings
+            if(timer >= limitTimer){
+                NotifyEnd();
+            }
+
+            if(bricksValidated == 12){
+                NotifyEnd();
+            }
+        }
+
+        batch.begin();
+        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(sword, sword.getX(), Gdx.graphics.getHeight()*0.43f + gemSize, Gdx.graphics.getWidth()*0.09f, Gdx.graphics.getHeight()*0.3f);
+        scoreFont.draw(batch, new Integer(bricksValidated).toString(), new Double(Gdx.graphics.getWidth() * 0.92).intValue(), new Double(Gdx.graphics.getHeight() * 0.965).intValue());
+        gameFont.draw(batch, gameTextString, new Double(Gdx.graphics.getWidth() * 0.35).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
+        gameFont.draw(batch, countdownText, new Double(Gdx.graphics.getWidth() * 0.5).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
+
+        batch.end();
+        batch.begin();
+        stage.draw();
+        batch.end();
+
+        batch.begin();
+
+        for(int i = 0; i < gems.size(); i++){
+            Gem myGem = gems.get(i);
+            if(myGem.GetDisplayed()){
+                batch.draw(myGem, myGem.getPositionX(), myGem.getPositionY(), myGem.getSize(), myGem.getSize());
+            }
+        }
+
+        batch.draw(fillBarSprite, new Double(Gdx.graphics.getWidth() * 0.31).intValue(),
+                new Double(Gdx.graphics.getHeight() * 0.925).intValue(),
+                new Double((Gdx.graphics.getWidth() * 0.4) * fillAmount).intValue(),
+                new Double(Gdx.graphics.getWidth() * 0.015).intValue());
+
+        batch.end();
+
+        batch.begin();
+        stage.draw();
+        batch.end();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

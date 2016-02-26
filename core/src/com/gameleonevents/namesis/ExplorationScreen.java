@@ -108,21 +108,6 @@ public class ExplorationScreen implements Screen {
 
         game.batch.begin();
         if (game.act.SendBeaconId() != null){
-            /*for (Map.Entry<String, String> beacon : game.act.SendBeaconId().entrySet())
-            {
-
-                if(beacon.getKey().equals("0117C55B5938") && (beacon.getValue().equals("PROXIMITY_NEAR") || beacon.getValue().equals("PROXIMITY_IMMEDIATE"))){
-                    hopital = true;
-                }
-                if(beacon.getKey().equals("0117C55CDCC2") && (beacon.getValue().equals("PROXIMITY_NEAR") || beacon.getValue().equals("PROXIMITY_IMMEDIATE"))){
-                    boost = true;
-                }
-                if(beacon.getKey().equals("0117C552789F") && (beacon.getValue().equals("PROXIMITY_NEAR") || beacon.getValue().equals("PROXIMITY_IMMEDIATE"))){
-                    boost = true;
-                }
-                if(beacon.getKey().equals("0117C55E2F15") && (beacon.getValue().equals("PROXIMITY_NEAR") || beacon.getValue().equals("PROXIMITY_IMMEDIATE"))){
-                    armory = true;
-                }*/
             if(game.act.SendBeaconId().containsKey("0117C55B5938")) {
                 hopital = true;
             }
@@ -143,7 +128,6 @@ public class ExplorationScreen implements Screen {
 
 
             if (hopital) {
-                Gdx.app.log("My Tag", "Test");
                 draw1 = applicationSkin.getDrawable("hopital");
                 draw1.setMinHeight((draw1.getMinHeight() * Gdx.graphics.getHeight() * 0.0016f));
                 draw1.setMinWidth((draw1.getMinWidth() * Gdx.graphics.getWidth() * 0.001f));
@@ -323,10 +307,21 @@ public class ExplorationScreen implements Screen {
                 game.setScreen(new ModeScreen(game));
                 break;
             case "predateur":
-                if(state == PlayerMode.predateur){
-                    //game.setScreen(new Attack(game));
-                }
-                game.setScreen(new ModeScreen(game));
+                    if(Math.random()>=0.5) {
+                        game.setScreen(new Attack(game));
+                    }
+                    else{
+                        game.setScreen(new Defense(game));
+                    }
+                break;
+            case "defenseur":
+                    if(Math.random()>=0.5) {
+                        game.setScreen(new CounterAttack(game));
+                    }
+                    else{
+                        game.setScreen(new TrapDefender(game));
+                    }
+                break;
                 /*Skin uiSkin = new Skin(Gdx.files.internal("data/uiskin.json"));
                 Label label = new Label("Voulez-vous vraiment attaquer ce joueur?", uiSkin);
                 label.setWrap(true);

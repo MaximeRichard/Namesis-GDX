@@ -2,6 +2,7 @@ package com.gameleonevents.namesis;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.HashMap;
@@ -36,7 +38,7 @@ enum GemColor{
     NONE
 }
 
-public class Defense extends ApplicationAdapter {
+public class Defense implements Screen {
 
     private final float limitTimer = 0.75f;
 
@@ -77,18 +79,13 @@ public class Defense extends ApplicationAdapter {
 
     private String countdownText;
     private String gameText;
-
+    private NamesisGame game;
     private LinkedList<String> imagesPath;
     private LinkedList<ColoredSword> swords;
     private LinkedHashMap<SwordColor, String> shieldPath;
 
-    public Defense(ActionResolver actionResolver) {
-        this.act = actionResolver;
-    }
-
-    @Override
-    public void create()
-    {
+    public Defense(NamesisGame game) {
+        this.game = game;
         //Creating text using free type font generator. This allows to create
         //bitmap font without any quality loss.
         FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("data/HAMLETORNOT.TTF"));
@@ -158,85 +155,7 @@ public class Defense extends ApplicationAdapter {
         gameState = GameState.COUNTDOWN;
     }
 
-    @Override
-    public void render()
-    {
-        if(gameState == GameState.COUNTDOWN)
-        {
-            countdown -= Gdx.app.getGraphics().getDeltaTime();
 
-            if(countdown > 1){
-                countdownText = new Integer(new Double(Math.floor(countdown)).intValue()).toString();
-            }
-            else if(countdown <= 1 && countdown > 0){
-                countdownText = "";
-                gameText = "Pare les attaques !";
-            }
-            else{
-                gameText = "";
-                gameState = GameState.INGAME;
-            }
-        }
-
-        Gdx.gl.glClearColor(1, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        shieldSprite = new Sprite(new Texture(shieldPath.get(shieldColor)));
-
-        batch.begin();
-        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.draw(shieldSprite, new Double(Gdx.graphics.getWidth() * 0.5).intValue(),
-                new Double(Gdx.graphics.getHeight() * 0.4).intValue(),
-                new Double(Gdx.graphics.getWidth() * 0.16).intValue(),
-                new Double(Gdx.graphics.getHeight() * 0.4).intValue());
-        score.draw(batch, new Integer(defenceValidated).toString(), new Double(Gdx.graphics.getWidth() * 0.92).intValue(), new Double(Gdx.graphics.getHeight() * 0.965).intValue());
-
-        batch.draw(fillBarSprite, new Double(Gdx.graphics.getWidth() * 0.31).intValue(),
-                new Double(Gdx.graphics.getHeight() * 0.925).intValue(),
-                new Double((Gdx.graphics.getWidth() * 0.4) * fillAmount).intValue(),
-                new Double(Gdx.graphics.getWidth() * 0.015).intValue());
-
-        gameFont.draw(batch, gameText, new Double(Gdx.graphics.getWidth() * 0.37).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
-        gameFont.draw(batch, countdownText, new Double(Gdx.graphics.getWidth() * 0.5).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
-
-        batch.end();
-        batch.begin();
-        stage.draw();
-        batch.end();
-
-        if(gameState == GameState.INGAME)
-        {
-            if(swordIndex >= 12){
-                NotifyEnd();
-            }
-            else
-            {
-                swordSelected = swords.get(swordIndex);
-                batch.begin();
-                batch.draw(swordSelected, new Double(Gdx.graphics.getWidth() * 0.3).intValue(),
-                        new Double(Gdx.graphics.getHeight() * 0.42).intValue(),
-                        new Double(Gdx.graphics.getWidth() * 0.12).intValue(),
-                        new Double(Gdx.graphics.getHeight() * 0.3).intValue());
-                batch.end();
-
-                if(hasFailed){
-                    batch.begin();
-                    batch.draw(failSprite, new Double(Gdx.graphics.getWidth() * 0.48).intValue(),
-                            new Double(Gdx.graphics.getHeight() * 0.4).intValue(),
-                            new Double(Gdx.graphics.getWidth() * 0.2).intValue(),
-                            new Double(Gdx.graphics.getHeight() * 0.4).intValue());
-                    batch.end();
-                }
-
-                timer += Gdx.app.getGraphics().getDeltaTime();
-                fillAmount = new Double((limitTimer - timer) / limitTimer).floatValue();
-
-                if(timer >= limitTimer){
-                    NextGem();
-                }
-            }
-        }
-    }
 
     private void NextGem(){
             timer = 0;
@@ -368,6 +287,122 @@ public class Defense extends ApplicationAdapter {
         gameState = GameState.STOPPED;
         shieldColor = SwordColor.NONE;
         gameText = "Score final : " + defenceValidated + " points";
+        float delay = 1; // seconds
+
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                game.setScreen(new ExplorationScreen(game, PlayerMode.predateur));
+            }
+        }, delay);
     }
 
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void render(float delta) {
+        if(gameState == GameState.COUNTDOWN)
+        {
+            countdown -= Gdx.app.getGraphics().getDeltaTime();
+
+            if(countdown > 1){
+                countdownText = new Integer(new Double(Math.floor(countdown)).intValue()).toString();
+            }
+            else if(countdown <= 1 && countdown > 0){
+                countdownText = "";
+                gameText = "Pare les attaques !";
+            }
+            else{
+                gameText = "";
+                gameState = GameState.INGAME;
+            }
+        }
+
+        Gdx.gl.glClearColor(1, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        shieldSprite = new Sprite(new Texture(shieldPath.get(shieldColor)));
+
+        batch.begin();
+        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(shieldSprite, new Double(Gdx.graphics.getWidth() * 0.5).intValue(),
+                new Double(Gdx.graphics.getHeight() * 0.4).intValue(),
+                new Double(Gdx.graphics.getWidth() * 0.16).intValue(),
+                new Double(Gdx.graphics.getHeight() * 0.4).intValue());
+        score.draw(batch, new Integer(defenceValidated).toString(), new Double(Gdx.graphics.getWidth() * 0.92).intValue(), new Double(Gdx.graphics.getHeight() * 0.965).intValue());
+
+        batch.draw(fillBarSprite, new Double(Gdx.graphics.getWidth() * 0.31).intValue(),
+                new Double(Gdx.graphics.getHeight() * 0.925).intValue(),
+                new Double((Gdx.graphics.getWidth() * 0.4) * fillAmount).intValue(),
+                new Double(Gdx.graphics.getWidth() * 0.015).intValue());
+
+        gameFont.draw(batch, gameText, new Double(Gdx.graphics.getWidth() * 0.37).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
+        gameFont.draw(batch, countdownText, new Double(Gdx.graphics.getWidth() * 0.5).intValue(), new Double(Gdx.graphics.getHeight() * 0.3).intValue());
+
+        batch.end();
+        batch.begin();
+        stage.draw();
+        batch.end();
+
+        if(gameState == GameState.INGAME)
+        {
+            if(swordIndex >= 12){
+                NotifyEnd();
+            }
+            else
+            {
+                swordSelected = swords.get(swordIndex);
+                batch.begin();
+                batch.draw(swordSelected, new Double(Gdx.graphics.getWidth() * 0.3).intValue(),
+                        new Double(Gdx.graphics.getHeight() * 0.42).intValue(),
+                        new Double(Gdx.graphics.getWidth() * 0.12).intValue(),
+                        new Double(Gdx.graphics.getHeight() * 0.3).intValue());
+                batch.end();
+
+                if(hasFailed){
+                    batch.begin();
+                    batch.draw(failSprite, new Double(Gdx.graphics.getWidth() * 0.48).intValue(),
+                            new Double(Gdx.graphics.getHeight() * 0.4).intValue(),
+                            new Double(Gdx.graphics.getWidth() * 0.2).intValue(),
+                            new Double(Gdx.graphics.getHeight() * 0.4).intValue());
+                    batch.end();
+                }
+
+                timer += Gdx.app.getGraphics().getDeltaTime();
+                fillAmount = new Double((limitTimer - timer) / limitTimer).floatValue();
+
+                if(timer >= limitTimer){
+                    NextGem();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void resize(int width, int height) {
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
+
+    }
 }
