@@ -41,6 +41,7 @@ enum GemColor{
 public class Defense implements Screen {
 
     private final float limitTimer = 0.75f;
+    private String screen= "";
 
     private SpriteBatch batch;
 
@@ -289,10 +290,16 @@ public class Defense implements Screen {
         gameText = "Score final : " + defenceValidated + " points";
         float delay = 1; // seconds
 
+        int enemyScore = IA.SimulerAttaque();
+        if(enemyScore > defenceValidated)
+            screen = "data/screens/defense-echoue.png";
+        else
+            screen = "data/screens/defense-reussi.png";
+
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
-                game.setScreen(new ExplorationScreen(game, PlayerMode.predateur));
+                game.setScreen(new EcranIntermediaire(game, PlayerMode.predateur, screen));
             }
         }, delay);
     }
